@@ -24,7 +24,7 @@ export function ExpenseCard({ recibo }: ExpenseCardProps) {
 
   return (
     <Card className="hover:shadow-md transition-shadow">
-      <CardContent className="p-4">
+      <CardContent className="px-4">
         <div className="flex items-start justify-between gap-4">
           <div className="flex-1 space-y-2">
             {/* Establishment Name */}

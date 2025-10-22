@@ -8,7 +8,9 @@ import { ExpenseCard } from "@/components/expense-card"
 import { StatsCard } from "@/components/stats-card"
 import { ExpenseFilters, type FilterState } from "@/components/expense-filters"
 import { TelegramLinkDialog } from "@/components/telegram-link-dialog"
+import { Footer } from "@/components/footer"
 import type { Recibo } from "@/lib/types"
+import { formatCurrency, getUniqueValues } from "@/lib/format-utils"
 import { Receipt, TrendingUp, Calendar, CreditCard, BarChart3, Link2 } from "lucide-react"
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert"
 import { InfoIcon } from "lucide-react"
@@ -131,17 +133,9 @@ export default function DashboardPage() {
   })
   const monthlySpent = monthlyReceipts.reduce((sum, r) => sum + Number(r.valor_total), 0)
 
-  const formatCurrency = (value: number) =>
-    new Intl.NumberFormat("pt-BR", {
-      style: "currency",
-      currency: "BRL",
-    }).format(value)
-
   // Get unique establishment types and payment methods for filters
-  const establishmentTypes = Array.from(
-    new Set(receipts.map((r) => r.tipo_estabelecimento).filter(Boolean)),
-  ) as string[]
-  const paymentMethods = Array.from(new Set(receipts.map((r) => r.metodo_pagamento).filter(Boolean))) as string[]
+  const establishmentTypes = getUniqueValues(receipts.map((r) => r.tipo_estabelecimento))
+  const paymentMethods = getUniqueValues(receipts.map((r) => r.metodo_pagamento))
 
   if (loading) {
     return (
@@ -165,7 +159,7 @@ export default function DashboardPage() {
           <div className="flex items-center justify-between">
             <div>
               <h2 className="text-3xl font-bold">Dashboard</h2>
-              <p className="text-muted-foreground mt-1">Track and manage your expenses</p>
+              <p className="text-muted-foreground mt-1">Let Tobby help you manage your finances</p>
             </div>
             <Button asChild>
               <Link href="/dashboard/analytics">
@@ -275,6 +269,8 @@ export default function DashboardPage() {
           window.location.reload()
         }}
       />
+
+      <Footer />
     </div>
   )
 }

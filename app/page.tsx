@@ -1,5 +1,6 @@
 import Link from "next/link"
 import { Button } from "@/components/ui/button"
+import { Footer } from "@/components/footer"
 import { ArrowRight, BarChart3, Receipt, Shield } from "lucide-react"
 
 export default function HomePage() {
@@ -10,10 +11,10 @@ export default function HomePage() {
         <section className="bg-gradient-to-br from-slate-50 to-slate-100 py-20 px-4">
           <div className="container mx-auto max-w-6xl">
             <div className="flex flex-col items-center text-center space-y-8">
-              <h1 className="text-4xl md:text-6xl font-bold text-balance">Track Your Expenses with Ease</h1>
+              <h1 className="text-4xl md:text-6xl font-bold text-balance">Meet Tobby, Your Financial Companion</h1>
               <p className="text-lg md:text-xl text-muted-foreground max-w-2xl text-pretty">
-                Automatically process receipts via Telegram and get instant insights into your spending habits. Simple,
-                secure, and intelligent.
+                Tobby automatically processes receipts via Telegram and gives you instant insights into your spending habits. Simple,
+                friendly, and intelligent.
               </p>
               <div className="flex flex-col sm:flex-row gap-4">
                 <Button asChild size="lg">
@@ -66,12 +67,7 @@ export default function HomePage() {
         </section>
       </main>
 
-      {/* Footer */}
-      <footer className="border-t py-8 px-4">
-        <div className="container mx-auto max-w-6xl text-center text-sm text-muted-foreground">
-          <p>Built with Next.js, Supabase, and Shadcn UI</p>
-        </div>
-      </footer>
+      <Footer />
     </div>
   )
 }

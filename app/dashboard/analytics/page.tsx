@@ -2,7 +2,9 @@ import { redirect } from "next/navigation"
 import { getSupabaseServerClient } from "@/lib/supabase/server"
 import { DashboardHeader } from "@/components/dashboard-header"
 import { SpendingChart } from "@/components/spending-chart"
+import { Footer } from "@/components/footer"
 import type { Recibo } from "@/lib/types"
+import { formatCurrency, getEstablishmentType, getPaymentMethod } from "@/lib/format-utils"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import Link from "next/link"
 import { Button } from "@/components/ui/button"
@@ -39,7 +41,7 @@ export default async function AnalyticsPage() {
   // Calculate spending by establishment type
   const spendingByType = receipts.reduce(
     (acc, r) => {
-      const type = r.tipo_estabelecimento || "Other"
+      const type = getEstablishmentType(r)
       acc[type] = (acc[type] || 0) + Number(r.valor_total)
       return acc
     },
@@ -53,7 +55,7 @@ export default async function AnalyticsPage() {
   // Calculate spending by payment method
   const spendingByPayment = receipts.reduce(
     (acc, r) => {
-      const method = r.metodo_pagamento || "Other"
+      const method = getPaymentMethod(r)
       acc[method] = (acc[method] || 0) + Number(r.valor_total)
       return acc
     },
@@ -76,12 +78,6 @@ export default async function AnalyticsPage() {
     .map(([name, value]) => ({ name, value }))
     .slice(0, 6)
     .reverse()
-
-  const formatCurrency = (value: number) =>
-    new Intl.NumberFormat("pt-BR", {
-      style: "currency",
-      currency: "BRL",
-    }).format(value)
 
   // Top spending categories
   const topCategories = typeChartData.slice(0, 3)
@@ -150,6 +146,8 @@ export default async function AnalyticsPage() {
           />
         </div>
       </main>
+
+      <Footer />
     </div>
   )
 }

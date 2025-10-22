@@ -11,7 +11,6 @@ export function DashboardHeader() {
       <div className="container mx-auto flex h-16 items-center justify-between px-4">
         {/* Logo and Brand */}
         <Link href="/dashboard" className="flex items-center gap-3 hover:opacity-80 transition-opacity">
-          <div className="text-3xl">🐕</div>
           <div className="flex flex-col">
             <h1 className="text-xl font-bold leading-none">Tobby</h1>
             <span className="text-xs text-muted-foreground hidden sm:block">Your Financial Companion</span>

@@ -75,9 +75,8 @@
 }
 
 @theme inline {
-  /* optional: --font-sans, --font-serif, --font-mono if they are applied in the layout.tsx */
-  --font-sans: "Geist", "Geist Fallback";
-  --font-mono: "Geist Mono", "Geist Mono Fallback";
+  /* Noto Sans as default font family */
+  --font-sans: var(--font-noto-sans), system-ui, -apple-system, sans-serif;
 
   --color-background: var(--background);
   --color-foreground: var(--foreground);

@@ -41,7 +41,7 @@ export function ExpenseCard({ recibo }: ExpenseCardProps) {
             )}
 
             {/* Date and Payment Method */}
-            <div className="flex flex-wrap gap-3 text-sm text-muted-foreground">
+            <div className="flex flex-wrap gap-3 text-xs text-muted-foreground">
               <div className="flex items-center gap-1">
                 <Calendar className="h-3 w-3" />
                 <span>{formattedDate}</span>

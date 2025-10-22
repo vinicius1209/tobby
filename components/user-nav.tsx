@@ -12,9 +12,19 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { Button } from "@/components/ui/button"
-import { User, Settings, CreditCard, LogOut, Crown } from "lucide-react"
+import { User, Settings, CreditCard, LogOut, Crown, Loader2 } from "lucide-react"
 import Link from "next/link"
 
 interface UserData {
@@ -28,6 +38,8 @@ export function UserNav() {
   const supabase = getSupabaseBrowserClient()
   const [user, setUser] = useState<UserData | null>(null)
   const [loading, setLoading] = useState(true)
+  const [showLogoutDialog, setShowLogoutDialog] = useState(false)
+  const [isLoggingOut, setIsLoggingOut] = useState(false)
 
   useEffect(() => {
     const fetchUser = async () => {
@@ -49,9 +61,19 @@ export function UserNav() {
   }, [supabase])
 
   const handleSignOut = async () => {
-    await supabase.auth.signOut()
-    router.push("/login")
-    router.refresh()
+    setIsLoggingOut(true)
+    try {
+      await supabase.auth.signOut()
+      router.push("/login")
+      router.refresh()
+    } catch (error) {
+      console.error("Error signing out:", error)
+      setIsLoggingOut(false)
+    }
+  }
+
+  const openLogoutDialog = () => {
+    setShowLogoutDialog(true)
   }
 
   if (loading || !user) {
@@ -116,11 +138,43 @@ export function UserNav() {
           </DropdownMenuItem>
         </DropdownMenuGroup>
         <DropdownMenuSeparator />
-        <DropdownMenuItem onClick={handleSignOut} className="cursor-pointer text-red-600">
+        <DropdownMenuItem onClick={openLogoutDialog} className="cursor-pointer text-red-600">
           <LogOut className="mr-2 h-4 w-4" />
           <span>Sign out</span>
         </DropdownMenuItem>
       </DropdownMenuContent>
+
+      {/* Logout Confirmation Dialog */}
+      <AlertDialog open={showLogoutDialog} onOpenChange={setShowLogoutDialog}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Sair da sua conta?</AlertDialogTitle>
+            <AlertDialogDescription>
+              Você será desconectado do Tobby. Precisará fazer login novamente para acessar sua conta.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel disabled={isLoggingOut}>Cancelar</AlertDialogCancel>
+            <AlertDialogAction
+              onClick={handleSignOut}
+              disabled={isLoggingOut}
+              className="bg-red-600 hover:bg-red-700 focus:ring-red-600"
+            >
+              {isLoggingOut ? (
+                <>
+                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                  Saindo...
+                </>
+              ) : (
+                <>
+                  <LogOut className="mr-2 h-4 w-4" />
+                  Sair
+                </>
+              )}
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </DropdownMenu>
   )
 }

@@ -2,6 +2,7 @@ import { redirect } from "next/navigation"
 import { getSupabaseServerClient } from "@/lib/supabase/server"
 import { DashboardHeader } from "@/components/dashboard-header"
 import { SpendingChart } from "@/components/spending-chart"
+import { ExpensesTimeline } from "@/components/expenses-timeline"
 import { Footer } from "@/components/footer"
 import type { Recibo } from "@/lib/types"
 import { formatCurrency, getEstablishmentType, getPaymentMethod } from "@/lib/format-utils"
@@ -144,6 +145,11 @@ export default async function AnalyticsPage() {
             title="Monthly Spending Trend"
             description="Your spending over the last 6 months"
           />
+        </div>
+
+        {/* Timeline Section */}
+        <div className="mt-8">
+          <ExpensesTimeline receipts={receipts} limit={15} />
         </div>
       </main>
 

@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from "react"
 import { useRouter } from "next/navigation"
+import { useTranslations } from "next-intl"
 import { getSupabaseBrowserClient } from "@/lib/supabase/client"
 import { DashboardHeader } from "@/components/dashboard-header"
 import { ExpenseCard } from "@/components/expense-card"
@@ -19,6 +20,8 @@ import Link from "next/link"
 import { Card } from "@/components/ui/card"
 
 export default function DashboardPage() {
+  const t = useTranslations('dashboard')
+  const tCommon = useTranslations('common')
   const [receipts, setReceipts] = useState<Recibo[]>([])
   const [filteredReceipts, setFilteredReceipts] = useState<Recibo[]>([])
   const [loading, setLoading] = useState(true)
@@ -143,7 +146,7 @@ export default function DashboardPage() {
         <DashboardHeader />
         <main className="container mx-auto px-4 py-8">
           <div className="flex items-center justify-center h-64">
-            <p className="text-muted-foreground">Loading...</p>
+            <p className="text-muted-foreground">{tCommon('loading')}</p>
           </div>
         </main>
       </div>
@@ -158,13 +161,13 @@ export default function DashboardPage() {
           {/* Header */}
           <div className="flex items-center justify-between">
             <div>
-              <h2 className="text-3xl font-bold">Dashboard</h2>
-              <p className="text-muted-foreground mt-1">Let Tobby help you manage your finances</p>
+              <h2 className="text-3xl font-bold">{t('title')}</h2>
+              <p className="text-muted-foreground mt-1">{t('subtitle')}</p>
             </div>
             <Button asChild>
               <Link href="/dashboard/analytics">
                 <BarChart3 className="mr-2 h-4 w-4" />
-                View Analytics
+                {t('viewAnalytics')}
               </Link>
             </Button>
           </div>
@@ -172,27 +175,27 @@ export default function DashboardPage() {
           {/* Stats Grid */}
           <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
             <StatsCard
-              title="Total Spent"
+              title={t('stats.totalSpent')}
               value={formatCurrency(totalSpent)}
-              description="Filtered results"
+              description={t('stats.filteredResults')}
               icon={TrendingUp}
             />
             <StatsCard
-              title="This Month"
+              title={t('stats.thisMonth')}
               value={formatCurrency(monthlySpent)}
-              description={`${monthlyReceipts.length} receipts`}
+              description={`${monthlyReceipts.length} ${t('stats.receipts')}`}
               icon={Calendar}
             />
             <StatsCard
-              title="Total Receipts"
+              title={t('stats.totalReceipts')}
               value={totalReceipts.toString()}
-              description="Filtered results"
+              description={t('stats.filteredResults')}
               icon={Receipt}
             />
             <StatsCard
-              title="Average Expense"
+              title={t('stats.avgExpense')}
               value={formatCurrency(avgSpent)}
-              description="Per receipt"
+              description={t('stats.perReceipt')}
               icon={CreditCard}
             />
           </div>
@@ -208,14 +211,14 @@ export default function DashboardPage() {
           {!isLinked && (
             <Alert>
               <Link2 className="h-4 w-4" />
-              <AlertTitle>Connect your Telegram account</AlertTitle>
+              <AlertTitle>{t('telegram.connectTitle')}</AlertTitle>
               <AlertDescription className="mt-2">
                 <p className="mb-3">
-                  Link your Telegram account to automatically track expenses from receipt photos sent to our bot.
+                  {t('telegram.connectDescription')}
                 </p>
                 <Button onClick={() => setShowLinkDialog(true)} size="sm">
                   <Link2 className="mr-2 h-4 w-4" />
-                  Link Telegram Account
+                  {t('telegram.linkAccount')}
                 </Button>
               </AlertDescription>
             </Alert>
@@ -225,8 +228,7 @@ export default function DashboardPage() {
             <Alert>
               <InfoIcon className="h-4 w-4" />
               <AlertDescription>
-                No expenses found. Start sending receipt photos to your Telegram bot to automatically track your
-                expenses here!
+                {t('telegram.noExpenses')}
               </AlertDescription>
             </Alert>
           )}
@@ -235,7 +237,7 @@ export default function DashboardPage() {
           <div className="space-y-4">
             <div className="flex items-center justify-between">
               <h3 className="text-xl font-semibold">
-                Recent Expenses{" "}
+                {t('recentExpenses')}{" "}
                 {filteredReceipts.length !== receipts.length && `(${filteredReceipts.length} of ${receipts.length})`}
               </h3>
             </div>
@@ -248,12 +250,12 @@ export default function DashboardPage() {
             ) : receipts.length > 0 ? (
               <Card className="p-8 text-center">
                 <InfoIcon className="h-12 w-12 mx-auto text-muted-foreground mb-4" />
-                <p className="text-muted-foreground">No expenses match your filters</p>
+                <p className="text-muted-foreground">{t('noExpensesMatchFilters')}</p>
               </Card>
             ) : (
               <Card className="p-8 text-center">
                 <Receipt className="h-12 w-12 mx-auto text-muted-foreground mb-4" />
-                <p className="text-muted-foreground">No expenses to display</p>
+                <p className="text-muted-foreground">{t('noExpensesToDisplay')}</p>
               </Card>
             )}
           </div>

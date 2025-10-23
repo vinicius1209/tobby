@@ -1,0 +1,240 @@
+{
+  "common": {
+    "loading": "Loading...",
+    "email": "Email",
+    "password": "Password",
+    "cancel": "Cancel",
+    "save": "Save",
+    "delete": "Delete",
+    "edit": "Edit",
+    "close": "Close",
+    "back": "Back",
+    "next": "Next",
+    "submit": "Submit",
+    "search": "Search",
+    "filter": "Filter",
+    "all": "All",
+    "others": "Others",
+    "notInformed": "Not Informed",
+    "noDetails": "No Details"
+  },
+  "auth": {
+    "login": {
+      "title": "Welcome back",
+      "description": "Sign in to your account to view your expenses",
+      "submit": "Sign in",
+      "signingIn": "Signing in...",
+      "dontHaveAccount": "Don't have an account?",
+      "signUp": "Sign up",
+      "failedToSignIn": "Failed to sign in"
+    },
+    "signup": {
+      "title": "Create an account",
+      "description": "Enter your details to start tracking your expenses",
+      "confirmPassword": "Confirm Password",
+      "submit": "Create account",
+      "creatingAccount": "Creating account...",
+      "alreadyHaveAccount": "Already have an account?",
+      "signIn": "Sign in",
+      "passwordsDoNotMatch": "Passwords do not match",
+      "passwordTooShort": "Password must be at least 6 characters",
+      "accountCreated": "Account created successfully! Redirecting to dashboard...",
+      "failedToCreateAccount": "Failed to create account"
+    },
+    "logout": {
+      "title": "Sign out of your account?",
+      "description": "You will be signed out of Tobby. You'll need to sign in again to access your account.",
+      "confirm": "Sign out",
+      "loggingOut": "Signing out..."
+    }
+  },
+  "brand": {
+    "name": "Tobby",
+    "tagline": "Your Financial Companion",
+    "description": "Your friendly financial companion. Track expenses effortlessly with AI-powered receipt processing."
+  },
+  "dashboard": {
+    "title": "Dashboard",
+    "subtitle": "Let Tobby help you manage your finances",
+    "viewAnalytics": "View Analytics",
+    "recentExpenses": "Recent Expenses",
+    "noExpensesMatchFilters": "No expenses match your filters",
+    "noExpensesToDisplay": "No expenses to display",
+    "stats": {
+      "totalSpent": "Total Spent",
+      "thisMonth": "This Month",
+      "totalReceipts": "Total Receipts",
+      "avgExpense": "Average Expense",
+      "filteredResults": "Filtered results",
+      "receipts": "receipts",
+      "perReceipt": "Per receipt"
+    },
+    "telegram": {
+      "connectTitle": "Connect your Telegram account",
+      "connectDescription": "Link your Telegram account to automatically track expenses from receipt photos sent to our bot.",
+      "linkAccount": "Link Telegram Account",
+      "noExpenses": "No expenses found. Start sending receipt photos to your Telegram bot to automatically track your expenses here!"
+    }
+  },
+  "analytics": {
+    "title": "Analytics",
+    "subtitle": "Detailed insights into your spending patterns",
+    "backToDashboard": "Back to Dashboard",
+    "topCategories": {
+      "title": "Top Spending Categories",
+      "description": "Your highest expense categories"
+    },
+    "charts": {
+      "spendingByCategory": "Spending by Category",
+      "spendingByCategoryDesc": "Total spent per establishment type",
+      "spendingByPayment": "Spending by Payment Method",
+      "spendingByPaymentDesc": "Total spent per payment method",
+      "monthlyTrend": "Monthly Spending Trend",
+      "monthlyTrendDesc": "Your spending over the last 6 months"
+    }
+  },
+  "premium": {
+    "title": "Upgrade to Premium",
+    "subtitle": "Unlock powerful features to take control of your finances",
+    "backToDashboard": "Back to Dashboard",
+    "currentPlan": "You are currently on the Premium plan. Thank you for your support!",
+    "planTitle": "Premium Plan",
+    "mostPopular": "Most Popular",
+    "price": "R$ 29.90",
+    "perMonth": "/month",
+    "planDescription": "Everything you need to master your expenses",
+    "features": {
+      "advancedAnalytics": {
+        "name": "Advanced Analytics",
+        "description": "Deep insights into your spending patterns with custom reports and trends"
+      },
+      "exportData": {
+        "name": "Export Data",
+        "description": "Export your expense data to CSV or PDF for accounting and tax purposes"
+      },
+      "budgetAlerts": {
+        "name": "Budget Alerts",
+        "description": "Set spending limits and receive real-time alerts when you approach them"
+      },
+      "unlimitedReceipts": {
+        "name": "Unlimited Receipts",
+        "description": "Process unlimited receipts per month without restrictions"
+      },
+      "prioritySupport": {
+        "name": "Priority Support",
+        "description": "Get priority customer support with faster response times"
+      },
+      "customCategories": {
+        "name": "Custom Categories",
+        "description": "Create and manage custom expense categories for better organization"
+      }
+    },
+    "upgradeButton": "Stripe Integration Coming Soon",
+    "currentPlanButton": "Current Plan",
+    "cancelAnytime": "Cancel anytime. No questions asked. Your data stays with you.",
+    "comparePlans": "Compare Plans",
+    "freePlan": {
+      "title": "Free Plan",
+      "description": "Perfect for getting started",
+      "features": {
+        "basicTracking": "Basic expense tracking",
+        "limitedReceipts": "Up to 50 receipts/month",
+        "basicAnalytics": "Basic analytics",
+        "standardSupport": "Standard support"
+      }
+    },
+    "premiumPlan": {
+      "title": "Premium Plan",
+      "description": "For serious expense tracking",
+      "features": {
+        "everythingInFree": "Everything in Free, plus:",
+        "unlimitedReceipts": "Unlimited receipts",
+        "advancedAnalytics": "Advanced analytics & reports",
+        "dataExport": "Data export (CSV/PDF)",
+        "budgetAlerts": "Budget alerts",
+        "prioritySupport": "Priority support"
+      }
+    }
+  },
+  "telegramLink": {
+    "title": "Link Telegram Account",
+    "description": "Connect your Telegram account to automatically track your expenses from receipt photos.",
+    "tokenExpires": "Your link token (expires in 15 minutes):",
+    "instructions": {
+      "step1": "Copy the token above",
+      "step2": "Open your Telegram bot",
+      "step3": "Send the command:",
+      "step4": "Click \"Check Link Status\" below"
+    },
+    "checkStatus": "Check Link Status",
+    "checking": "Checking...",
+    "success": "Successfully linked! Your Telegram account is now connected.",
+    "notLinkedYet": "Not linked yet. Please send the token to the Telegram bot.",
+    "failedToGenerate": "Failed to generate token"
+  },
+  "expenses": {
+    "card": {
+      "items": "Items"
+    },
+    "timeline": {
+      "title": "Expenses Timeline",
+      "description": "Last {limit} recorded expenses",
+      "historicalDescription": "Chronological history of your expenses",
+      "noExpenses": "No expenses recorded yet",
+      "total": "Total of last {count} expenses"
+    },
+    "filters": {
+      "search": "Search expenses...",
+      "establishmentType": "Establishment Type",
+      "paymentMethod": "Payment Method",
+      "dateRange": "Date Range",
+      "from": "From",
+      "to": "To",
+      "clearFilters": "Clear Filters"
+    }
+  },
+  "navigation": {
+    "dashboard": "Dashboard",
+    "analytics": "Analytics",
+    "premium": "Premium",
+    "settings": "Settings",
+    "billing": "Billing",
+    "signOut": "Sign out",
+    "upgrade": "Upgrade",
+    "comingSoon": "Coming Soon"
+  },
+  "footer": {
+    "product": "Product",
+    "support": "Support",
+    "connect": "Connect",
+    "documentation": "Documentation",
+    "helpCenter": "Help Center",
+    "privacyPolicy": "Privacy Policy",
+    "termsOfService": "Terms of Service",
+    "allRightsReserved": "All rights reserved.",
+    "builtWith": "Built with Next.js, Supabase, and Shadcn UI"
+  },
+  "home": {
+    "hero": {
+      "title": "Meet Tobby, Your Financial Companion",
+      "description": "Tobby automatically processes receipts via Telegram and gives you instant insights into your spending habits. Simple, friendly, and intelligent.",
+      "getStarted": "Get Started",
+      "signIn": "Sign In"
+    },
+    "features": {
+      "title": "Everything you need to manage expenses",
+      "receipt": {
+        "title": "Smart Receipt Processing",
+        "description": "Send receipt photos via Telegram and let AI automatically extract and categorize your expenses"
+      },
+      "analytics": {
+        "title": "Insightful Analytics",
+        "description": "Visualize your spending patterns with intuitive charts and detailed breakdowns"
+      },
+      "security": {
+        "title": "Secure & Private",
+        "description": "Your financial data is encrypted and protected with enterprise-grade security"
+      }
+    }
+  }
+}

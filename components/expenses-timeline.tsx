@@ -1,8 +1,11 @@
+"use client"
+
 import type { Recibo } from "@/lib/types"
 import { formatCurrency, formatDate, getEstablishmentName, getEstablishmentType, hasEstablishmentType } from "@/lib/format-utils"
 import { Badge } from "@/components/ui/badge"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Calendar, TrendingUp } from "lucide-react"
+import { useTranslations } from "next-intl"
 
 interface ExpensesTimelineProps {
   receipts: Recibo[]
@@ -16,6 +19,9 @@ interface GroupedReceipts {
 }
 
 export function ExpensesTimeline({ receipts, limit = 10 }: ExpensesTimelineProps) {
+  const t = useTranslations('expenses.timeline')
+  const tCommon = useTranslations('common')
+
   // Agrupar recibos por data de criação (dia)
   const groupedByDate = receipts
     .sort((a, b) => new Date(b.criado_em).getTime() - new Date(a.criado_em).getTime())
@@ -47,12 +53,12 @@ export function ExpensesTimeline({ receipts, limit = 10 }: ExpensesTimelineProps
     return (
       <Card>
         <CardHeader>
-          <CardTitle>Timeline de Gastos</CardTitle>
-          <CardDescription>Histórico cronológico dos seus gastos</CardDescription>
+          <CardTitle>{t('title')}</CardTitle>
+          <CardDescription>{t('historicalDescription')}</CardDescription>
         </CardHeader>
         <CardContent>
           <p className="text-sm text-muted-foreground text-center py-8">
-            Nenhum gasto registrado ainda
+            {t('noExpenses')}
           </p>
         </CardContent>
       </Card>
@@ -62,8 +68,8 @@ export function ExpensesTimeline({ receipts, limit = 10 }: ExpensesTimelineProps
   return (
     <Card>
       <CardHeader>
-        <CardTitle>Timeline de Gastos</CardTitle>
-        <CardDescription>Últimos {limit} gastos registrados</CardDescription>
+        <CardTitle>{t('title')}</CardTitle>
+        <CardDescription>{t('description', { limit })}</CardDescription>
       </CardHeader>
       <CardContent>
         <div className="relative space-y-6">
@@ -92,8 +98,8 @@ export function ExpensesTimeline({ receipts, limit = 10 }: ExpensesTimelineProps
                     hour: "2-digit",
                     minute: "2-digit",
                   })
-                  const establishmentName = getEstablishmentName(receipt)
-                  const establishmentType = getEstablishmentType(receipt)
+                  const establishmentName = getEstablishmentName(receipt, tCommon('notInformed'))
+                  const establishmentType = getEstablishmentType(receipt, tCommon('others'))
 
                   return (
                     <div
@@ -130,7 +136,7 @@ export function ExpensesTimeline({ receipts, limit = 10 }: ExpensesTimelineProps
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-2 text-sm text-muted-foreground">
                 <TrendingUp className="h-4 w-4" />
-                <span>Total dos últimos {receipts.slice(0, limit).length} gastos</span>
+                <span>{t('total', { count: receipts.slice(0, limit).length })}</span>
               </div>
               <p className="font-semibold">
                 {formatCurrency(

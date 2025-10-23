@@ -10,8 +10,11 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import Link from "next/link"
 import { Button } from "@/components/ui/button"
 import { ArrowLeft } from "lucide-react"
+import { getTranslations } from "next-intl/server"
 
 export default async function AnalyticsPage() {
+  const t = await getTranslations('analytics')
+  const tCommon = await getTranslations('common')
   const supabase = await getSupabaseServerClient()
 
   const {
@@ -42,7 +45,7 @@ export default async function AnalyticsPage() {
   // Calculate spending by establishment type
   const spendingByType = receipts.reduce(
     (acc, r) => {
-      const type = getEstablishmentType(r)
+      const type = getEstablishmentType(r, tCommon('others'))
       acc[type] = (acc[type] || 0) + Number(r.valor_total)
       return acc
     },
@@ -56,7 +59,7 @@ export default async function AnalyticsPage() {
   // Calculate spending by payment method
   const spendingByPayment = receipts.reduce(
     (acc, r) => {
-      const method = getPaymentMethod(r)
+      const method = getPaymentMethod(r, tCommon('notInformed'))
       acc[method] = (acc[method] || 0) + Number(r.valor_total)
       return acc
     },
@@ -93,21 +96,21 @@ export default async function AnalyticsPage() {
             <Button variant="ghost" size="sm" asChild>
               <Link href="/dashboard">
                 <ArrowLeft className="h-4 w-4 mr-2" />
-                Back to Dashboard
+                {t('backToDashboard')}
               </Link>
             </Button>
           </div>
 
           <div>
-            <h2 className="text-3xl font-bold">Analytics</h2>
-            <p className="text-muted-foreground mt-1">Detailed insights into your spending patterns</p>
+            <h2 className="text-3xl font-bold">{t('title')}</h2>
+            <p className="text-muted-foreground mt-1">{t('subtitle')}</p>
           </div>
 
           {/* Top Categories */}
           <Card>
             <CardHeader>
-              <CardTitle>Top Spending Categories</CardTitle>
-              <CardDescription>Your highest expense categories</CardDescription>
+              <CardTitle>{t('topCategories.title')}</CardTitle>
+              <CardDescription>{t('topCategories.description')}</CardDescription>
             </CardHeader>
             <CardContent>
               <div className="space-y-4">
@@ -130,20 +133,20 @@ export default async function AnalyticsPage() {
           <div className="grid gap-6 lg:grid-cols-2">
             <SpendingChart
               data={typeChartData}
-              title="Spending by Category"
-              description="Total spent per establishment type"
+              title={t('charts.spendingByCategory')}
+              description={t('charts.spendingByCategoryDesc')}
             />
             <SpendingChart
               data={paymentChartData}
-              title="Spending by Payment Method"
-              description="Total spent per payment method"
+              title={t('charts.spendingByPayment')}
+              description={t('charts.spendingByPaymentDesc')}
             />
           </div>
 
           <SpendingChart
             data={monthlyChartData}
-            title="Monthly Spending Trend"
-            description="Your spending over the last 6 months"
+            title={t('charts.monthlyTrend')}
+            description={t('charts.monthlyTrendDesc')}
           />
         </div>
 

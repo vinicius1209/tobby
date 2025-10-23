@@ -1,8 +1,14 @@
+"use client"
+
 import Link from "next/link"
+import { useTranslations } from "next-intl"
 import { Github, Twitter, Mail } from "lucide-react"
 
 export function Footer() {
   const currentYear = new Date().getFullYear()
+  const t = useTranslations('footer')
+  const tBrand = useTranslations('brand')
+  const tNav = useTranslations('navigation')
 
   return (
     <footer className="border-t bg-background">
@@ -12,30 +18,30 @@ export function Footer() {
           <div className="space-y-4">
             <div className="flex items-center gap-2">
               <span className="text-2xl">🐕</span>
-              <span className="text-lg font-bold">Tobby</span>
+              <span className="text-lg font-bold">{tBrand('name')}</span>
             </div>
             <p className="text-sm text-muted-foreground">
-              Your friendly financial companion. Track expenses effortlessly with AI-powered receipt processing.
+              {tBrand('description')}
             </p>
           </div>
 
           {/* Product */}
           <div className="space-y-4">
-            <h3 className="text-sm font-semibold">Product</h3>
+            <h3 className="text-sm font-semibold">{t('product')}</h3>
             <ul className="space-y-2 text-sm">
               <li>
                 <Link href="/dashboard" className="text-muted-foreground hover:text-foreground transition-colors">
-                  Dashboard
+                  {tNav('dashboard')}
                 </Link>
               </li>
               <li>
                 <Link href="/dashboard/analytics" className="text-muted-foreground hover:text-foreground transition-colors">
-                  Analytics
+                  {tNav('analytics')}
                 </Link>
               </li>
               <li>
                 <Link href="/dashboard/premium" className="text-muted-foreground hover:text-foreground transition-colors">
-                  Premium
+                  {tNav('premium')}
                 </Link>
               </li>
             </ul>
@@ -43,26 +49,26 @@ export function Footer() {
 
           {/* Support */}
           <div className="space-y-4">
-            <h3 className="text-sm font-semibold">Support</h3>
+            <h3 className="text-sm font-semibold">{t('support')}</h3>
             <ul className="space-y-2 text-sm">
               <li>
                 <a href="#" className="text-muted-foreground hover:text-foreground transition-colors">
-                  Documentation
+                  {t('documentation')}
                 </a>
               </li>
               <li>
                 <a href="#" className="text-muted-foreground hover:text-foreground transition-colors">
-                  Help Center
+                  {t('helpCenter')}
                 </a>
               </li>
               <li>
                 <a href="#" className="text-muted-foreground hover:text-foreground transition-colors">
-                  Privacy Policy
+                  {t('privacyPolicy')}
                 </a>
               </li>
               <li>
                 <a href="#" className="text-muted-foreground hover:text-foreground transition-colors">
-                  Terms of Service
+                  {t('termsOfService')}
                 </a>
               </li>
             </ul>
@@ -70,7 +76,7 @@ export function Footer() {
 
           {/* Connect */}
           <div className="space-y-4">
-            <h3 className="text-sm font-semibold">Connect</h3>
+            <h3 className="text-sm font-semibold">{t('connect')}</h3>
             <div className="flex gap-4">
               <a
                 href="https://github.com/vinicius1209/tobby"
@@ -103,10 +109,10 @@ export function Footer() {
         <div className="mt-12 border-t pt-8">
           <div className="flex flex-col md:flex-row justify-between items-center gap-4 text-sm text-muted-foreground">
             <p>
-              © {currentYear} Tobby. All rights reserved.
+              © {currentYear} {tBrand('name')}. {t('allRightsReserved')}
             </p>
             <p className="text-xs">
-              Built with Next.js, Supabase, and Shadcn UI
+              {t('builtWith')}
             </p>
           </div>
         </div>

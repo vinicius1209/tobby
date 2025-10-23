@@ -1,3 +1,5 @@
+"use client"
+
 import { Card, CardContent } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import type { Recibo } from "@/lib/types"
@@ -11,16 +13,19 @@ import {
   hasItems,
 } from "@/lib/format-utils"
 import { Calendar, CreditCard, Store, Package } from "lucide-react"
+import { useTranslations } from "next-intl"
 
 interface ExpenseCardProps {
   recibo: Recibo
 }
 
 export function ExpenseCard({ recibo }: ExpenseCardProps) {
+  const tCommon = useTranslations('common')
+
   const formattedDate = formatDate(recibo.data_compra)
   const formattedValue = formatCurrency(recibo.valor_total)
-  const establishmentName = getEstablishmentName(recibo)
-  const establishmentType = getEstablishmentType(recibo)
+  const establishmentName = getEstablishmentName(recibo, tCommon('notInformed'))
+  const establishmentType = getEstablishmentType(recibo, tCommon('others'))
 
   return (
     <Card className="hover:shadow-md transition-shadow">

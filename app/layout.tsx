@@ -1,6 +1,8 @@
 import type { Metadata } from 'next'
 import { Noto_Sans } from 'next/font/google'
 import { Analytics } from '@vercel/analytics/next'
+import { NextIntlClientProvider } from 'next-intl'
+import { getMessages, getLocale } from 'next-intl/server'
 import './globals.css'
 
 const notoSans = Noto_Sans({
@@ -25,15 +27,23 @@ export const metadata: Metadata = {
   },
 }
 
-export default function RootLayout({
+export default async function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode
 }>) {
+  // Get locale from cookie (via i18n.ts config)
+  const locale = await getLocale()
+
+  // Get messages for the current locale
+  const messages = await getMessages()
+
   return (
-    <html lang="pt-BR" className={notoSans.variable}>
+    <html lang={locale} className={notoSans.variable} suppressHydrationWarning>
       <body className="font-sans antialiased">
-        {children}
+        <NextIntlClientProvider messages={messages}>
+          {children}
+        </NextIntlClientProvider>
         <Analytics />
       </body>
     </html>

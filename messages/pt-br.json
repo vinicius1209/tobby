@@ -1,0 +1,240 @@
+{
+  "common": {
+    "loading": "Carregando...",
+    "email": "E-mail",
+    "password": "Senha",
+    "cancel": "Cancelar",
+    "save": "Salvar",
+    "delete": "Excluir",
+    "edit": "Editar",
+    "close": "Fechar",
+    "back": "Voltar",
+    "next": "Próximo",
+    "submit": "Enviar",
+    "search": "Buscar",
+    "filter": "Filtrar",
+    "all": "Todos",
+    "others": "Outros",
+    "notInformed": "Não Informado",
+    "noDetails": "Sem Detalhes"
+  },
+  "auth": {
+    "login": {
+      "title": "Bem-vindo de volta",
+      "description": "Entre na sua conta para ver suas despesas",
+      "submit": "Entrar",
+      "signingIn": "Entrando...",
+      "dontHaveAccount": "Não tem uma conta?",
+      "signUp": "Cadastre-se",
+      "failedToSignIn": "Falha ao entrar"
+    },
+    "signup": {
+      "title": "Criar uma conta",
+      "description": "Digite seus dados para começar a rastrear suas despesas",
+      "confirmPassword": "Confirmar Senha",
+      "submit": "Criar conta",
+      "creatingAccount": "Criando conta...",
+      "alreadyHaveAccount": "Já tem uma conta?",
+      "signIn": "Entre",
+      "passwordsDoNotMatch": "As senhas não coincidem",
+      "passwordTooShort": "A senha deve ter pelo menos 6 caracteres",
+      "accountCreated": "Conta criada com sucesso! Redirecionando para o painel...",
+      "failedToCreateAccount": "Falha ao criar conta"
+    },
+    "logout": {
+      "title": "Sair da sua conta?",
+      "description": "Você será desconectado do Tobby. Precisará fazer login novamente para acessar sua conta.",
+      "confirm": "Sair",
+      "loggingOut": "Saindo..."
+    }
+  },
+  "brand": {
+    "name": "Tobby",
+    "tagline": "Seu Companheiro Financeiro",
+    "description": "Seu amigo companheiro financeiro. Rastreie despesas sem esforço com processamento de recibos com IA."
+  },
+  "dashboard": {
+    "title": "Painel",
+    "subtitle": "Deixe o Tobby te ajudar a gerenciar suas finanças",
+    "viewAnalytics": "Ver Análises",
+    "recentExpenses": "Despesas Recentes",
+    "noExpensesMatchFilters": "Nenhuma despesa corresponde aos seus filtros",
+    "noExpensesToDisplay": "Nenhuma despesa para exibir",
+    "stats": {
+      "totalSpent": "Total Gasto",
+      "thisMonth": "Este Mês",
+      "totalReceipts": "Total de Recibos",
+      "avgExpense": "Gasto Médio",
+      "filteredResults": "Resultados filtrados",
+      "receipts": "recibos",
+      "perReceipt": "Por recibo"
+    },
+    "telegram": {
+      "connectTitle": "Conecte sua conta do Telegram",
+      "connectDescription": "Vincule sua conta do Telegram para rastrear automaticamente despesas de fotos de recibos enviadas ao nosso bot.",
+      "linkAccount": "Vincular Conta do Telegram",
+      "noExpenses": "Nenhuma despesa encontrada. Comece enviando fotos de recibos para o seu bot do Telegram para rastrear automaticamente suas despesas aqui!"
+    }
+  },
+  "analytics": {
+    "title": "Análises",
+    "subtitle": "Insights detalhados sobre seus padrões de gastos",
+    "backToDashboard": "Voltar ao Painel",
+    "topCategories": {
+      "title": "Principais Categorias de Gastos",
+      "description": "Suas categorias de despesas mais altas"
+    },
+    "charts": {
+      "spendingByCategory": "Gastos por Categoria",
+      "spendingByCategoryDesc": "Total gasto por tipo de estabelecimento",
+      "spendingByPayment": "Gastos por Método de Pagamento",
+      "spendingByPaymentDesc": "Total gasto por método de pagamento",
+      "monthlyTrend": "Tendência de Gastos Mensais",
+      "monthlyTrendDesc": "Seus gastos nos últimos 6 meses"
+    }
+  },
+  "premium": {
+    "title": "Atualizar para Premium",
+    "subtitle": "Desbloqueie recursos poderosos para controlar suas finanças",
+    "backToDashboard": "Voltar ao Painel",
+    "currentPlan": "Você está atualmente no plano Premium. Obrigado pelo seu apoio!",
+    "planTitle": "Plano Premium",
+    "mostPopular": "Mais Popular",
+    "price": "R$ 29,90",
+    "perMonth": "/mês",
+    "planDescription": "Tudo que você precisa para dominar suas despesas",
+    "features": {
+      "advancedAnalytics": {
+        "name": "Análises Avançadas",
+        "description": "Insights profundos sobre seus padrões de gastos com relatórios e tendências personalizados"
+      },
+      "exportData": {
+        "name": "Exportar Dados",
+        "description": "Exporte seus dados de despesas para CSV ou PDF para fins contábeis e fiscais"
+      },
+      "budgetAlerts": {
+        "name": "Alertas de Orçamento",
+        "description": "Defina limites de gastos e receba alertas em tempo real quando se aproximar deles"
+      },
+      "unlimitedReceipts": {
+        "name": "Recibos Ilimitados",
+        "description": "Processe recibos ilimitados por mês sem restrições"
+      },
+      "prioritySupport": {
+        "name": "Suporte Prioritário",
+        "description": "Obtenha suporte ao cliente prioritário com tempos de resposta mais rápidos"
+      },
+      "customCategories": {
+        "name": "Categorias Personalizadas",
+        "description": "Crie e gerencie categorias de despesas personalizadas para melhor organização"
+      }
+    },
+    "upgradeButton": "Integração Stripe em Breve",
+    "currentPlanButton": "Plano Atual",
+    "cancelAnytime": "Cancele a qualquer momento. Sem perguntas. Seus dados ficam com você.",
+    "comparePlans": "Comparar Planos",
+    "freePlan": {
+      "title": "Plano Gratuito",
+      "description": "Perfeito para começar",
+      "features": {
+        "basicTracking": "Rastreamento básico de despesas",
+        "limitedReceipts": "Até 50 recibos/mês",
+        "basicAnalytics": "Análises básicas",
+        "standardSupport": "Suporte padrão"
+      }
+    },
+    "premiumPlan": {
+      "title": "Plano Premium",
+      "description": "Para rastreamento sério de despesas",
+      "features": {
+        "everythingInFree": "Tudo do Gratuito, mais:",
+        "unlimitedReceipts": "Recibos ilimitados",
+        "advancedAnalytics": "Análises avançadas e relatórios",
+        "dataExport": "Exportação de dados (CSV/PDF)",
+        "budgetAlerts": "Alertas de orçamento",
+        "prioritySupport": "Suporte prioritário"
+      }
+    }
+  },
+  "telegramLink": {
+    "title": "Vincular Conta do Telegram",
+    "description": "Conecte sua conta do Telegram para rastrear automaticamente suas despesas de fotos de recibos.",
+    "tokenExpires": "Seu token de vinculação (expira em 15 minutos):",
+    "instructions": {
+      "step1": "Copie o token acima",
+      "step2": "Abra seu bot do Telegram",
+      "step3": "Envie o comando:",
+      "step4": "Clique em \"Verificar Status da Vinculação\" abaixo"
+    },
+    "checkStatus": "Verificar Status da Vinculação",
+    "checking": "Verificando...",
+    "success": "Vinculado com sucesso! Sua conta do Telegram está conectada agora.",
+    "notLinkedYet": "Ainda não vinculado. Por favor, envie o token para o bot do Telegram.",
+    "failedToGenerate": "Falha ao gerar token"
+  },
+  "expenses": {
+    "card": {
+      "items": "Itens"
+    },
+    "timeline": {
+      "title": "Timeline de Gastos",
+      "description": "Últimos {limit} gastos registrados",
+      "historicalDescription": "Histórico cronológico dos seus gastos",
+      "noExpenses": "Nenhum gasto registrado ainda",
+      "total": "Total dos últimos {count} gastos"
+    },
+    "filters": {
+      "search": "Buscar despesas...",
+      "establishmentType": "Tipo de Estabelecimento",
+      "paymentMethod": "Método de Pagamento",
+      "dateRange": "Período",
+      "from": "De",
+      "to": "Até",
+      "clearFilters": "Limpar Filtros"
+    }
+  },
+  "navigation": {
+    "dashboard": "Painel",
+    "analytics": "Análises",
+    "premium": "Premium",
+    "settings": "Configurações",
+    "billing": "Cobrança",
+    "signOut": "Sair",
+    "upgrade": "Atualizar",
+    "comingSoon": "Em Breve"
+  },
+  "footer": {
+    "product": "Produto",
+    "support": "Suporte",
+    "connect": "Conectar",
+    "documentation": "Documentação",
+    "helpCenter": "Central de Ajuda",
+    "privacyPolicy": "Política de Privacidade",
+    "termsOfService": "Termos de Serviço",
+    "allRightsReserved": "Todos os direitos reservados.",
+    "builtWith": "Construído com Next.js, Supabase e Shadcn UI"
+  },
+  "home": {
+    "hero": {
+      "title": "Conheça o Tobby, Seu Companheiro Financeiro",
+      "description": "O Tobby processa automaticamente recibos via Telegram e fornece insights instantâneos sobre seus hábitos de gastos. Simples, amigável e inteligente.",
+      "getStarted": "Começar",
+      "signIn": "Entrar"
+    },
+    "features": {
+      "title": "Tudo que você precisa para gerenciar despesas",
+      "receipt": {
+        "title": "Processamento Inteligente de Recibos",
+        "description": "Envie fotos de recibos via Telegram e deixe a IA extrair e categorizar automaticamente suas despesas"
+      },
+      "analytics": {
+        "title": "Análises Perspicazes",
+        "description": "Visualize seus padrões de gastos com gráficos intuitivos e detalhamentos detalhados"
+      },
+      "security": {
+        "title": "Seguro e Privado",
+        "description": "Seus dados financeiros são criptografados e protegidos com segurança de nível empresarial"
+      }
+    }
+  }
+}

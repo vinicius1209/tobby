@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react"
 import { useRouter } from "next/navigation"
+import { useTranslations } from "next-intl"
 import { getSupabaseBrowserClient } from "@/lib/supabase/client"
 import {
   DropdownMenu,
@@ -34,6 +35,9 @@ interface UserData {
 }
 
 export function UserNav() {
+  const t = useTranslations('navigation')
+  const tLogout = useTranslations('auth.logout')
+  const tCommon = useTranslations('common')
   const router = useRouter()
   const supabase = getSupabaseBrowserClient()
   const [user, setUser] = useState<UserData | null>(null)
@@ -119,28 +123,28 @@ export function UserNav() {
           <DropdownMenuItem asChild>
             <Link href="/dashboard" className="cursor-pointer">
               <User className="mr-2 h-4 w-4" />
-              <span>Dashboard</span>
+              <span>{t('dashboard')}</span>
             </Link>
           </DropdownMenuItem>
           <DropdownMenuItem asChild>
             <Link href="/dashboard/premium" className="cursor-pointer">
               <Crown className="mr-2 h-4 w-4 text-amber-500" />
-              <span>Upgrade to Premium</span>
+              <span>{t('upgrade')}</span>
             </Link>
           </DropdownMenuItem>
           <DropdownMenuItem disabled>
             <Settings className="mr-2 h-4 w-4" />
-            <span>Settings</span>
+            <span>{t('settings')}</span>
           </DropdownMenuItem>
           <DropdownMenuItem disabled>
             <CreditCard className="mr-2 h-4 w-4" />
-            <span>Billing</span>
+            <span>{t('billing')}</span>
           </DropdownMenuItem>
         </DropdownMenuGroup>
         <DropdownMenuSeparator />
         <DropdownMenuItem onClick={openLogoutDialog} className="cursor-pointer text-red-600">
           <LogOut className="mr-2 h-4 w-4" />
-          <span>Sign out</span>
+          <span>{t('signOut')}</span>
         </DropdownMenuItem>
       </DropdownMenuContent>
 
@@ -148,13 +152,13 @@ export function UserNav() {
       <AlertDialog open={showLogoutDialog} onOpenChange={setShowLogoutDialog}>
         <AlertDialogContent>
           <AlertDialogHeader>
-            <AlertDialogTitle>Sair da sua conta?</AlertDialogTitle>
+            <AlertDialogTitle>{tLogout('title')}</AlertDialogTitle>
             <AlertDialogDescription>
-              Você será desconectado do Tobby. Precisará fazer login novamente para acessar sua conta.
+              {tLogout('description')}
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
-            <AlertDialogCancel disabled={isLoggingOut}>Cancelar</AlertDialogCancel>
+            <AlertDialogCancel disabled={isLoggingOut}>{tCommon('cancel')}</AlertDialogCancel>
             <AlertDialogAction
               onClick={handleSignOut}
               disabled={isLoggingOut}
@@ -163,12 +167,12 @@ export function UserNav() {
               {isLoggingOut ? (
                 <>
                   <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                  Saindo...
+                  {tLogout('loggingOut')}
                 </>
               ) : (
                 <>
                   <LogOut className="mr-2 h-4 w-4" />
-                  Sair
+                  {tLogout('confirm')}
                 </>
               )}
             </AlertDialogAction>

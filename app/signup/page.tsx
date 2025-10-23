@@ -5,6 +5,7 @@ import type React from "react"
 import { useState } from "react"
 import { useRouter } from "next/navigation"
 import Link from "next/link"
+import { useTranslations } from "next-intl"
 import { getSupabaseBrowserClient } from "@/lib/supabase/client"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
@@ -14,6 +15,8 @@ import { Alert, AlertDescription } from "@/components/ui/alert"
 import { Loader2 } from "lucide-react"
 
 export default function SignupPage() {
+  const t = useTranslations('auth.signup')
+  const tCommon = useTranslations('common')
   const [email, setEmail] = useState("")
   const [password, setPassword] = useState("")
   const [confirmPassword, setConfirmPassword] = useState("")
@@ -29,13 +32,13 @@ export default function SignupPage() {
     setLoading(true)
 
     if (password !== confirmPassword) {
-      setError("Passwords do not match")
+      setError(t('passwordsDoNotMatch'))
       setLoading(false)
       return
     }
 
     if (password.length < 6) {
-      setError("Password must be at least 6 characters")
+      setError(t('passwordTooShort'))
       setLoading(false)
       return
     }
@@ -57,7 +60,7 @@ export default function SignupPage() {
         router.refresh()
       }, 2000)
     } catch (err: any) {
-      setError(err.message || "Failed to create account")
+      setError(err.message || t('failedToCreateAccount'))
     } finally {
       setLoading(false)
     }
@@ -67,8 +70,8 @@ export default function SignupPage() {
     <div className="flex min-h-screen items-center justify-center bg-gradient-to-br from-slate-50 to-slate-100 p-4">
       <Card className="w-full max-w-md">
         <CardHeader className="space-y-1">
-          <CardTitle className="text-2xl font-bold">Create an account</CardTitle>
-          <CardDescription>Enter your details to start tracking your expenses</CardDescription>
+          <CardTitle className="text-2xl font-bold">{t('title')}</CardTitle>
+          <CardDescription>{t('description')}</CardDescription>
         </CardHeader>
         <form onSubmit={handleSignup}>
           <CardContent className="space-y-4">
@@ -79,11 +82,11 @@ export default function SignupPage() {
             )}
             {success && (
               <Alert>
-                <AlertDescription>Account created successfully! Redirecting to dashboard...</AlertDescription>
+                <AlertDescription>{t('accountCreated')}</AlertDescription>
               </Alert>
             )}
             <div className="space-y-2">
-              <Label htmlFor="email">Email</Label>
+              <Label htmlFor="email">{tCommon('email')}</Label>
               <Input
                 id="email"
                 type="email"
@@ -95,7 +98,7 @@ export default function SignupPage() {
               />
             </div>
             <div className="space-y-2">
-              <Label htmlFor="password">Password</Label>
+              <Label htmlFor="password">{tCommon('password')}</Label>
               <Input
                 id="password"
                 type="password"
@@ -106,7 +109,7 @@ export default function SignupPage() {
               />
             </div>
             <div className="space-y-2">
-              <Label htmlFor="confirm-password">Confirm Password</Label>
+              <Label htmlFor="confirm-password">{t('confirmPassword')}</Label>
               <Input
                 id="confirm-password"
                 type="password"
@@ -122,16 +125,16 @@ export default function SignupPage() {
               {loading ? (
                 <>
                   <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                  Creating account...
+                  {t('creatingAccount')}
                 </>
               ) : (
-                "Create account"
+                t('submit')
               )}
             </Button>
             <p className="text-center text-sm text-muted-foreground">
-              Already have an account?{" "}
+              {t('alreadyHaveAccount')}{" "}
               <Link href="/login" className="font-medium text-primary hover:underline">
-                Sign in
+                {t('signIn')}
               </Link>
             </p>
           </CardFooter>

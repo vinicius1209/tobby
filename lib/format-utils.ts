@@ -39,31 +39,31 @@ export function formatDate(date: string | Date, options?: Intl.DateTimeFormatOpt
 /**
  * Safely get establishment name with fallback
  */
-export function getEstablishmentName(recibo: Recibo): string {
+export function getEstablishmentName(recibo: Recibo, fallback: string = "Não Informado"): string {
   if (!isNullish(recibo.nome_estabelecimento)) {
     return capitalizeWords(recibo.nome_estabelecimento!.trim())
   }
-  return "Não Informado"
+  return fallback
 }
 
 /**
  * Safely get establishment type with fallback
  */
-export function getEstablishmentType(recibo: Recibo): string {
+export function getEstablishmentType(recibo: Recibo, fallback: string = "Outros"): string {
   if (!isNullish(recibo.tipo_estabelecimento)) {
     return capitalizeWords(recibo.tipo_estabelecimento!.trim())
   }
-  return "Outros"
+  return fallback
 }
 
 /**
  * Safely get payment method with fallback
  */
-export function getPaymentMethod(recibo: Recibo): string {
+export function getPaymentMethod(recibo: Recibo, fallback: string = "Não Informado"): string {
   if (!isNullish(recibo.metodo_pagamento)) {
     return capitalizeWords(recibo.metodo_pagamento!.trim())
   }
-  return "Não Informado"
+  return fallback
 }
 
 /**
@@ -97,11 +97,11 @@ export function hasItems(recibo: Recibo): boolean {
 /**
  * Get items with fallback
  */
-export function getItems(recibo: Recibo): string {
+export function getItems(recibo: Recibo, fallback: string = "Sem Detalhes"): string {
   if (!isNullish(recibo.itens_comprados)) {
     return capitalizeWords(recibo.itens_comprados!.trim())
   }
-  return "Sem Detalhes"
+  return fallback
 }
 
 /**

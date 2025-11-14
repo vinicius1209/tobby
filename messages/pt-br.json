@@ -13,10 +13,14 @@
     "submit": "Enviar",
     "search": "Buscar",
     "filter": "Filtrar",
+    "filters": "Filtros",
     "all": "Todos",
+    "of": "de",
     "others": "Outros",
     "notInformed": "Não Informado",
-    "noDetails": "Sem Detalhes"
+    "noDetails": "Sem Detalhes",
+    "pickDate": "Escolha uma data",
+    "user": "Usuário"
   },
   "auth": {
     "login": {
@@ -57,7 +61,7 @@
     "title": "Painel",
     "subtitle": "Deixe o Tobby te ajudar a gerenciar suas finanças",
     "viewAnalytics": "Ver Análises",
-    "recentExpenses": "Despesas Recentes",
+    "recentExpenses": "Transações Recentes",
     "noExpensesMatchFilters": "Nenhuma despesa corresponde aos seus filtros",
     "noExpensesToDisplay": "Nenhuma despesa para exibir",
     "stats": {
@@ -172,9 +176,9 @@
     "notLinkedYet": "Ainda não vinculado. Por favor, envie o token para o bot do Telegram.",
     "failedToGenerate": "Falha ao gerar token"
   },
-  "expenses": {
+  "transactions": {
     "card": {
-      "items": "Itens"
+      "vsPreviousMonth": "vs mês ant."
     },
     "timeline": {
       "title": "Timeline de Gastos",
@@ -185,12 +189,73 @@
     },
     "filters": {
       "search": "Buscar despesas...",
+      "searchPlaceholder": "Buscar por estabelecimento ou itens...",
       "establishmentType": "Tipo de Estabelecimento",
+      "allTypes": "Todos os tipos",
       "paymentMethod": "Método de Pagamento",
       "dateRange": "Período",
       "from": "De",
       "to": "Até",
-      "clearFilters": "Limpar Filtros"
+      "clearFilters": "Limpar Filtros",
+      "quickFiltersLabel": "Filtros Rápidos",
+      "quickFilters": {
+        "thisWeek": "Esta Semana",
+        "thisMonth": "Este Mês",
+        "lastMonth": "Mês Passado",
+        "last7Days": "Últimos 7 dias",
+        "last30Days": "Últimos 30 dias"
+      },
+      "dateFrom": {
+        "label": "Data Inicial",
+        "placeholder": "Selecione data inicial"
+      },
+      "dateTo": {
+        "label": "Data Final",
+        "placeholder": "Selecione data final"
+      }
+    },
+    "listHeader": {
+      "establishment": "Estabelecimento",
+      "date": "Data",
+      "impact": "Impacto",
+      "frequency": "Frequência",
+      "trend": "Tendência",
+      "value": "Valor"
+    },
+    "viewModes": {
+      "cards": "Cards",
+      "timeline": "Timeline"
+    },
+    "actions": {
+      "edit": "Editar transação",
+      "delete": "Excluir transação"
+    },
+    "editDialog": {
+      "title": "Editar Transação",
+      "establishment": "Estabelecimento",
+      "establishmentPlaceholder": "Digite o nome do estabelecimento",
+      "date": "Data da Compra",
+      "value": "Valor Total",
+      "valuePlaceholder": "0,00",
+      "save": "Salvar Alterações",
+      "saving": "Salvando...",
+      "cancel": "Cancelar",
+      "success": "Transação atualizada com sucesso",
+      "error": "Falha ao atualizar transação",
+      "required": "Este campo é obrigatório",
+      "invalidValue": "Digite um valor válido"
+    },
+    "deleteDialog": {
+      "title": "Excluir Transação?",
+      "description": "Tem certeza que deseja excluir esta transação? Esta ação não pode ser desfeita.",
+      "establishmentLabel": "Estabelecimento:",
+      "dateLabel": "Data:",
+      "valueLabel": "Valor:",
+      "confirm": "Excluir",
+      "deleting": "Excluindo...",
+      "cancel": "Cancelar",
+      "success": "Transação excluída com sucesso",
+      "error": "Falha ao excluir transação"
     }
   },
   "navigation": {

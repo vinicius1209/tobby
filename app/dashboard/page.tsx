@@ -5,28 +5,52 @@ import { useRouter } from "next/navigation"
 import { useTranslations } from "next-intl"
 import { getSupabaseBrowserClient } from "@/lib/supabase/client"
 import { DashboardHeader } from "@/components/dashboard-header"
-import { ExpenseCard } from "@/components/expense-card"
+import { ExpenseCardAdvanced } from "@/components/expense-card-advanced"
+import { ExpenseListHeader } from "@/components/expense-list-header"
+import { ExpensesTimeline } from "@/components/expenses-timeline"
 import { StatsCard } from "@/components/stats-card"
 import { ExpenseFilters, type FilterState } from "@/components/expense-filters"
 import { TelegramLinkDialog } from "@/components/telegram-link-dialog"
+import { EditExpenseDialog } from "@/components/edit-expense-dialog"
+import { DeleteExpenseDialog } from "@/components/delete-expense-dialog"
 import { Footer } from "@/components/footer"
 import type { Recibo } from "@/lib/types"
-import { formatCurrency, getUniqueValues } from "@/lib/format-utils"
-import { Receipt, TrendingUp, Calendar, CreditCard, BarChart3, Link2 } from "lucide-react"
+import {
+  formatCurrency,
+  getUniqueValues,
+  calculateMonthPercentage,
+  calculateFrequency,
+  calculateTrend,
+  getMonthTotal,
+} from "@/lib/format-utils"
+import { Receipt, TrendingUp, Calendar, CreditCard, Link2, Filter } from "lucide-react"
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert"
 import { InfoIcon } from "lucide-react"
 import { Button } from "@/components/ui/button"
-import Link from "next/link"
 import { Card } from "@/components/ui/card"
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
+import { ScrollArea } from "@/components/ui/scroll-area"
+import {
+  Sheet,
+  SheetContent,
+  SheetHeader,
+  SheetTitle,
+  SheetTrigger,
+} from "@/components/ui/sheet"
 
 export default function DashboardPage() {
   const t = useTranslations('dashboard')
   const tCommon = useTranslations('common')
+  const tViewModes = useTranslations('transactions.viewModes')
   const [receipts, setReceipts] = useState<Recibo[]>([])
   const [filteredReceipts, setFilteredReceipts] = useState<Recibo[]>([])
   const [loading, setLoading] = useState(true)
   const [isLinked, setIsLinked] = useState(false)
   const [showLinkDialog, setShowLinkDialog] = useState(false)
+  const [sortBy, setSortBy] = useState<"date" | "impact" | "frequency" | "value" | null>("date")
+  const [sortOrder, setSortOrder] = useState<"asc" | "desc">("desc")
+  const [editingRecibo, setEditingRecibo] = useState<Recibo | null>(null)
+  const [deletingRecibo, setDeletingRecibo] = useState<Recibo | null>(null)
   const router = useRouter()
   const supabase = getSupabaseBrowserClient()
 
@@ -68,12 +92,13 @@ export default function DashboardPage() {
         return
       }
 
-      // Now fetch receipts filtered by the user's chat_id
+      // Now fetch transactions filtered by the user's chat_id and not soft-deleted
       const { data, error } = await supabase
-        .from("recibos_processados")
+        .from("user_transactions")
         .select("*")
         .eq("chat_id", telegramUser.chat_id)
-        .order("data_compra", { ascending: false })
+        .is("deleted_at", null)
+        .order("transaction_date", { ascending: false })
 
       if (error) {
         console.error("[v0] Error fetching receipts:", error)
@@ -95,35 +120,148 @@ export default function DashboardPage() {
       const term = filters.searchTerm.toLowerCase()
       filtered = filtered.filter(
         (r) =>
-          r.nome_estabelecimento?.toLowerCase().includes(term) ||
-          r.itens_comprados?.toLowerCase().includes(term) ||
-          r.tipo_estabelecimento?.toLowerCase().includes(term),
+          r.description?.toLowerCase().includes(term),
       )
     }
 
-    // Establishment type filter
+    // Description filter (was: establishment type filter)
     if (filters.establishmentType && filters.establishmentType !== "all") {
-      filtered = filtered.filter((r) => r.tipo_estabelecimento === filters.establishmentType)
-    }
-
-    // Payment method filter
-    if (filters.paymentMethod && filters.paymentMethod !== "all") {
-      filtered = filtered.filter((r) => r.metodo_pagamento === filters.paymentMethod)
+      filtered = filtered.filter((r) => r.description === filters.establishmentType)
     }
 
     // Date range filter
     if (filters.dateFrom) {
-      filtered = filtered.filter((r) => new Date(r.data_compra) >= new Date(filters.dateFrom))
+      filtered = filtered.filter((r) => new Date(r.transaction_date) >= new Date(filters.dateFrom))
     }
     if (filters.dateTo) {
-      filtered = filtered.filter((r) => new Date(r.data_compra) <= new Date(filters.dateTo))
+      filtered = filtered.filter((r) => new Date(r.transaction_date) <= new Date(filters.dateTo))
     }
 
     setFilteredReceipts(filtered)
   }
 
+  const handleSort = (field: "date" | "impact" | "frequency" | "value") => {
+    if (sortBy === field) {
+      // Toggle sort order if clicking the same field
+      setSortOrder(sortOrder === "asc" ? "desc" : "asc")
+    } else {
+      // Set new field and default to descending
+      setSortBy(field)
+      setSortOrder("desc")
+    }
+  }
+
+  const handleEditRecibo = (recibo: Recibo) => {
+    setEditingRecibo(recibo)
+  }
+
+  const handleDeleteRecibo = (recibo: Recibo) => {
+    setDeletingRecibo(recibo)
+  }
+
+  const handleSaveEdit = async (updates: Partial<Recibo>) => {
+    if (!editingRecibo) return
+
+    // Optimistic update - update local state immediately
+    const updatedRecibo = { ...editingRecibo, ...updates }
+    setReceipts((prev) =>
+      prev.map((r) => (r.id === editingRecibo.id ? updatedRecibo : r))
+    )
+    setFilteredReceipts((prev) =>
+      prev.map((r) => (r.id === editingRecibo.id ? updatedRecibo : r))
+    )
+
+    try {
+      // Update in database
+      const { error } = await supabase
+        .from("user_transactions")
+        .update(updates)
+        .eq("id", editingRecibo.id)
+
+      if (error) {
+        console.error("Error updating expense:", error)
+        // Revert on error
+        setReceipts((prev) =>
+          prev.map((r) => (r.id === editingRecibo.id ? editingRecibo : r))
+        )
+        setFilteredReceipts((prev) =>
+          prev.map((r) => (r.id === editingRecibo.id ? editingRecibo : r))
+        )
+        throw error
+      }
+    } catch (error) {
+      console.error("Failed to update expense:", error)
+      throw error
+    }
+  }
+
+  const handleConfirmDelete = async () => {
+    if (!deletingRecibo) return
+
+    // Optimistic update - remove from local state immediately
+    setReceipts((prev) => prev.filter((r) => r.id !== deletingRecibo.id))
+    setFilteredReceipts((prev) => prev.filter((r) => r.id !== deletingRecibo.id))
+
+    try {
+      // Soft delete in database
+      const { error } = await supabase
+        .from("user_transactions")
+        .update({ deleted_at: new Date().toISOString() })
+        .eq("id", deletingRecibo.id)
+
+      if (error) {
+        console.error("Error deleting expense:", error)
+        // Revert on error - add back to state
+        setReceipts((prev) => [...prev, deletingRecibo])
+        setFilteredReceipts((prev) => [...prev, deletingRecibo])
+        throw error
+      }
+    } catch (error) {
+      console.error("Failed to delete expense:", error)
+      throw error
+    }
+  }
+
+  // Apply sorting to filtered receipts
+  const sortedReceipts = [...filteredReceipts].sort((a, b) => {
+    if (!sortBy) return 0
+
+    let aValue: number
+    let bValue: number
+
+    switch (sortBy) {
+      case "date": {
+        aValue = new Date(a.transaction_date).getTime()
+        bValue = new Date(b.transaction_date).getTime()
+        break
+      }
+      case "impact": {
+        const currentMonth = new Date().getMonth()
+        const currentYear = new Date().getFullYear()
+        const monthTotal = getMonthTotal(filteredReceipts, currentMonth, currentYear)
+        aValue = calculateMonthPercentage(a, monthTotal)
+        bValue = calculateMonthPercentage(b, monthTotal)
+        break
+      }
+      case "frequency": {
+        aValue = calculateFrequency(a, filteredReceipts)
+        bValue = calculateFrequency(b, filteredReceipts)
+        break
+      }
+      case "value": {
+        aValue = a.amount
+        bValue = b.amount
+        break
+      }
+      default:
+        return 0
+    }
+
+    return sortOrder === "asc" ? aValue - bValue : bValue - aValue
+  })
+
   // Calculate stats from filtered receipts
-  const totalSpent = filteredReceipts.reduce((sum, r) => sum + Number(r.valor_total), 0)
+  const totalSpent = filteredReceipts.reduce((sum, r) => sum + Number(r.amount), 0)
   const totalReceipts = filteredReceipts.length
   const avgSpent = totalReceipts > 0 ? totalSpent / totalReceipts : 0
 
@@ -131,14 +269,16 @@ export default function DashboardPage() {
   const currentMonth = new Date().getMonth()
   const currentYear = new Date().getFullYear()
   const monthlyReceipts = filteredReceipts.filter((r) => {
-    const date = new Date(r.data_compra)
+    const date = new Date(r.transaction_date)
     return date.getMonth() === currentMonth && date.getFullYear() === currentYear
   })
-  const monthlySpent = monthlyReceipts.reduce((sum, r) => sum + Number(r.valor_total), 0)
+  const monthlySpent = monthlyReceipts.reduce((sum, r) => sum + Number(r.amount), 0)
 
-  // Get unique establishment types and payment methods for filters
-  const establishmentTypes = getUniqueValues(receipts.map((r) => r.tipo_estabelecimento))
-  const paymentMethods = getUniqueValues(receipts.map((r) => r.metodo_pagamento))
+  // Get unique descriptions for filters (was: establishment types)
+  const establishmentTypes = getUniqueValues(receipts.map((r) => r.description))
+
+  // Get current month total for percentage calculations
+  const currentMonthTotal = getMonthTotal(filteredReceipts, currentMonth, currentYear)
 
   if (loading) {
     return (
@@ -159,17 +299,9 @@ export default function DashboardPage() {
       <main className="container mx-auto px-4 py-8">
         <div className="space-y-8">
           {/* Header */}
-          <div className="flex items-center justify-between">
-            <div>
-              <h2 className="text-3xl font-bold">{t('title')}</h2>
-              <p className="text-muted-foreground mt-1">{t('subtitle')}</p>
-            </div>
-            <Button asChild>
-              <Link href="/dashboard/analytics">
-                <BarChart3 className="mr-2 h-4 w-4" />
-                {t('viewAnalytics')}
-              </Link>
-            </Button>
+          <div>
+            <h2 className="text-3xl font-bold">{t('title')}</h2>
+            <p className="text-muted-foreground mt-1">{t('subtitle')}</p>
           </div>
 
           {/* Stats Grid */}
@@ -183,29 +315,22 @@ export default function DashboardPage() {
             <StatsCard
               title={t('stats.thisMonth')}
               value={formatCurrency(monthlySpent)}
-              description={`${monthlyReceipts.length} ${t('stats.receipts')}`}
+              description={`${monthlyReceipts.length} ${t('stats.transactions')}`}
               icon={Calendar}
             />
             <StatsCard
-              title={t('stats.totalReceipts')}
+              title={t('stats.totalTransactions')}
               value={totalReceipts.toString()}
               description={t('stats.filteredResults')}
               icon={Receipt}
             />
             <StatsCard
-              title={t('stats.avgExpense')}
+              title={t('stats.avgTransaction')}
               value={formatCurrency(avgSpent)}
-              description={t('stats.perReceipt')}
+              description={t('stats.perTransaction')}
               icon={CreditCard}
             />
           </div>
-
-          {/* Filters */}
-          <ExpenseFilters
-            onFilterChange={handleFilterChange}
-            establishmentTypes={establishmentTypes}
-            paymentMethods={paymentMethods}
-          />
 
           {/* Telegram Integration Info */}
           {!isLinked && (
@@ -233,30 +358,99 @@ export default function DashboardPage() {
             </Alert>
           )}
 
-          {/* Recent Expenses */}
+          {/* Recent Expenses with Tabs */}
           <div className="space-y-4">
-            <div className="flex items-center justify-between">
-              <h3 className="text-xl font-semibold">
-                {t('recentExpenses')}{" "}
-                {filteredReceipts.length !== receipts.length && `(${filteredReceipts.length} of ${receipts.length})`}
-              </h3>
-            </div>
             {filteredReceipts.length > 0 ? (
-              <div className="grid gap-4">
-                {filteredReceipts.map((recibo) => (
-                  <ExpenseCard key={recibo.id} recibo={recibo} />
-                ))}
-              </div>
+              <Tabs defaultValue="cards" className="w-full">
+                {/* Header with title, tabs, and filter button */}
+                <div className="flex items-center justify-between mb-4">
+                  <h3 className="text-xl font-semibold">
+                    {t('recentExpenses')}{" "}
+                    {filteredReceipts.length !== receipts.length && (
+                      <span className="text-muted-foreground text-sm font-normal">
+                        ({filteredReceipts.length} {tCommon('of')} {receipts.length})
+                      </span>
+                    )}
+                  </h3>
+                  <div className="flex items-center gap-3">
+                    <TabsList className="grid w-64 grid-cols-2">
+                      <TabsTrigger value="cards">{tViewModes('cards')}</TabsTrigger>
+                      <TabsTrigger value="timeline">{tViewModes('timeline')}</TabsTrigger>
+                    </TabsList>
+                    <Sheet>
+                      <SheetTrigger asChild>
+                        <Button variant="outline" size="icon">
+                          <Filter className="h-4 w-4" />
+                        </Button>
+                      </SheetTrigger>
+                      <SheetContent side="right" className="w-full sm:max-w-md p-0">
+                        <SheetHeader className="px-4 pt-6 pb-4 border-b">
+                          <SheetTitle>{tCommon('filters')}</SheetTitle>
+                        </SheetHeader>
+                        <ExpenseFilters
+                          onFilterChange={handleFilterChange}
+                          establishmentTypes={establishmentTypes}
+                        />
+                      </SheetContent>
+                    </Sheet>
+                  </div>
+                </div>
+
+                {/* Card container with rounded corners */}
+                <Card className="rounded-2xl border-2 overflow-hidden">
+                  <TabsContent value="cards" className="m-0">
+                    <ScrollArea className="h-[600px]">
+                      <ExpenseListHeader
+                        sortBy={sortBy}
+                        sortOrder={sortOrder}
+                        onSort={handleSort}
+                      />
+                      <div>
+                        {sortedReceipts.map((recibo, index) => {
+                          const monthPercentage = calculateMonthPercentage(recibo, currentMonthTotal)
+                          const frequency = calculateFrequency(recibo, filteredReceipts)
+                          const trend = calculateTrend(recibo, filteredReceipts)
+
+                          return (
+                            <ExpenseCardAdvanced
+                              key={recibo.id}
+                              recibo={recibo}
+                              monthPercentage={monthPercentage}
+                              frequency={frequency}
+                              trend={trend}
+                              index={index}
+                              onEdit={handleEditRecibo}
+                              onDelete={handleDeleteRecibo}
+                            />
+                          )
+                        })}
+                      </div>
+                    </ScrollArea>
+                  </TabsContent>
+
+                  <TabsContent value="timeline" className="m-0 p-6">
+                    <ScrollArea className="h-[600px] pr-4">
+                      <ExpensesTimeline receipts={sortedReceipts} />
+                    </ScrollArea>
+                  </TabsContent>
+                </Card>
+              </Tabs>
             ) : receipts.length > 0 ? (
-              <Card className="p-8 text-center">
-                <InfoIcon className="h-12 w-12 mx-auto text-muted-foreground mb-4" />
-                <p className="text-muted-foreground">{t('noExpensesMatchFilters')}</p>
-              </Card>
+              <>
+                <h3 className="text-xl font-semibold">{t('recentExpenses')}</h3>
+                <Card className="p-8 text-center rounded-2xl">
+                  <InfoIcon className="h-12 w-12 mx-auto text-muted-foreground mb-4" />
+                  <p className="text-muted-foreground">{t('noTransactionsMatchFilters')}</p>
+                </Card>
+              </>
             ) : (
-              <Card className="p-8 text-center">
-                <Receipt className="h-12 w-12 mx-auto text-muted-foreground mb-4" />
-                <p className="text-muted-foreground">{t('noExpensesToDisplay')}</p>
-              </Card>
+              <>
+                <h3 className="text-xl font-semibold">{t('recentExpenses')}</h3>
+                <Card className="p-8 text-center rounded-2xl">
+                  <Receipt className="h-12 w-12 mx-auto text-muted-foreground mb-4" />
+                  <p className="text-muted-foreground">{t('noTransactionsToDisplay')}</p>
+                </Card>
+              </>
             )}
           </div>
         </div>
@@ -271,6 +465,26 @@ export default function DashboardPage() {
           window.location.reload()
         }}
       />
+
+      {/* Edit Expense Dialog */}
+      {editingRecibo && (
+        <EditExpenseDialog
+          open={!!editingRecibo}
+          onOpenChange={(open) => !open && setEditingRecibo(null)}
+          recibo={editingRecibo}
+          onSave={handleSaveEdit}
+        />
+      )}
+
+      {/* Delete Expense Dialog */}
+      {deletingRecibo && (
+        <DeleteExpenseDialog
+          open={!!deletingRecibo}
+          onOpenChange={(open) => !open && setDeletingRecibo(null)}
+          recibo={deletingRecibo}
+          onConfirm={handleConfirmDelete}
+        />
+      )}
 
       <Footer />
     </div>

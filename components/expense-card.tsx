@@ -6,13 +6,10 @@ import type { Recibo } from "@/lib/types"
 import {
   formatCurrency,
   formatDate,
-  getEstablishmentName,
-  getEstablishmentType,
-  hasEstablishmentType,
-  hasPaymentMethod,
-  hasItems,
+  getDescription,
+  hasDescription,
 } from "@/lib/format-utils"
-import { Calendar, CreditCard, Store, Package } from "lucide-react"
+import { Calendar, FileText } from "lucide-react"
 import { useTranslations } from "next-intl"
 
 interface ExpenseCardProps {
@@ -22,50 +19,26 @@ interface ExpenseCardProps {
 export function ExpenseCard({ recibo }: ExpenseCardProps) {
   const tCommon = useTranslations('common')
 
-  const formattedDate = formatDate(recibo.data_compra)
-  const formattedValue = formatCurrency(recibo.valor_total)
-  const establishmentName = getEstablishmentName(recibo, tCommon('notInformed'))
-  const establishmentType = getEstablishmentType(recibo, tCommon('others'))
+  const formattedDate = formatDate(recibo.transaction_date)
+  const formattedValue = formatCurrency(recibo.amount)
+  const description = getDescription(recibo, tCommon('notInformed'))
 
   return (
     <Card className="hover:shadow-md transition-shadow">
       <CardContent className="px-4">
         <div className="flex items-start justify-between gap-4">
           <div className="flex-1 space-y-2">
-            {/* Establishment Name */}
+            {/* Description */}
             <div className="flex items-center gap-2">
-              <Store className="h-4 w-4 text-muted-foreground" />
-              <h3 className="font-semibold">{establishmentName}</h3>
+              <FileText className="h-4 w-4 text-muted-foreground" />
+              <h3 className="font-semibold">{description}</h3>
             </div>
 
-            {/* Establishment Type Badge */}
-            {hasEstablishmentType(recibo) && (
-              <Badge variant="secondary" className="text-xs">
-                {establishmentType}
-              </Badge>
-            )}
-
-            {/* Date and Payment Method */}
-            <div className="flex flex-wrap gap-3 text-xs text-muted-foreground">
-              <div className="flex items-center gap-1">
-                <Calendar className="h-3 w-3" />
-                <span>{formattedDate}</span>
-              </div>
-              {hasPaymentMethod(recibo) && (
-                <div className="flex items-center gap-1">
-                  <CreditCard className="h-3 w-3" />
-                  <span>{recibo.metodo_pagamento}</span>
-                </div>
-              )}
+            {/* Date */}
+            <div className="flex items-center gap-1 text-xs text-muted-foreground">
+              <Calendar className="h-3 w-3" />
+              <span>{formattedDate}</span>
             </div>
-
-            {/* Items */}
-            {hasItems(recibo) && (
-              <div className="flex items-start gap-1">
-                <Package className="h-3 w-3 mt-0.5 text-muted-foreground flex-shrink-0" />
-                <p className="text-sm text-muted-foreground line-clamp-2">{recibo.itens_comprados}</p>
-              </div>
-            )}
           </div>
 
           {/* Value */}

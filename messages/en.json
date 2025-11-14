@@ -13,10 +13,14 @@
     "submit": "Submit",
     "search": "Search",
     "filter": "Filter",
+    "filters": "Filters",
     "all": "All",
+    "of": "of",
     "others": "Others",
     "notInformed": "Not Informed",
-    "noDetails": "No Details"
+    "noDetails": "No Details",
+    "pickDate": "Pick a date",
+    "user": "User"
   },
   "auth": {
     "login": {
@@ -57,17 +61,17 @@
     "title": "Dashboard",
     "subtitle": "Let Tobby help you manage your finances",
     "viewAnalytics": "View Analytics",
-    "recentExpenses": "Recent Expenses",
-    "noExpensesMatchFilters": "No expenses match your filters",
-    "noExpensesToDisplay": "No expenses to display",
+    "recentExpenses": "Recent Transactions",
+    "noTransactionsMatchFilters": "No transactions match your filters",
+    "noTransactionsToDisplay": "No transactions to display",
     "stats": {
       "totalSpent": "Total Spent",
       "thisMonth": "This Month",
-      "totalReceipts": "Total Receipts",
-      "avgExpense": "Average Expense",
+      "totalTransactions": "Total Transactions",
+      "avgTransaction": "Average Transaction",
       "filteredResults": "Filtered results",
-      "receipts": "receipts",
-      "perReceipt": "Per receipt"
+      "transactions": "transactions",
+      "perTransaction": "Per transaction"
     },
     "telegram": {
       "connectTitle": "Connect your Telegram account",
@@ -172,25 +176,107 @@
     "notLinkedYet": "Not linked yet. Please send the token to the Telegram bot.",
     "failedToGenerate": "Failed to generate token"
   },
-  "expenses": {
+  "transactions": {
     "card": {
-      "items": "Items"
+      "vsPreviousMonth": "vs prev. mo."
     },
     "timeline": {
-      "title": "Expenses Timeline",
-      "description": "Last {limit} recorded expenses",
-      "historicalDescription": "Chronological history of your expenses",
-      "noExpenses": "No expenses recorded yet",
-      "total": "Total of last {count} expenses"
+      "title": "Transactions Timeline",
+      "description": "Last {limit} recorded transactions",
+      "historicalDescription": "Chronological history of your transactions",
+      "noTransactions": "No transactions recorded yet",
+      "total": "Total of last {count} transactions"
     },
     "filters": {
-      "search": "Search expenses...",
-      "establishmentType": "Establishment Type",
-      "paymentMethod": "Payment Method",
+      "search": "Search transactions...",
+      "searchPlaceholder": "Search by description...",
+      "description": "Description",
+      "allDescriptions": "All descriptions",
+      "transactionType": "Transaction Type",
+      "allTypes": "All types",
+      "withdrawal": "Withdrawal",
+      "deposit": "Deposit",
       "dateRange": "Date Range",
       "from": "From",
       "to": "To",
-      "clearFilters": "Clear Filters"
+      "clearFilters": "Clear Filters",
+      "quickFiltersLabel": "Quick Filters",
+      "quickFilters": {
+        "thisWeek": "This Week",
+        "thisMonth": "This Month",
+        "lastMonth": "Last Month",
+        "last7Days": "Last 7 days",
+        "last30Days": "Last 30 days"
+      },
+      "dateFrom": {
+        "label": "Start Date",
+        "placeholder": "Select start date"
+      },
+      "dateTo": {
+        "label": "End Date",
+        "placeholder": "Select end date"
+      }
+    },
+    "listHeader": {
+      "description": "Description",
+      "date": "Date",
+      "impact": "Impact",
+      "frequency": "Frequency",
+      "trend": "Trend",
+      "amount": "Amount"
+    },
+    "viewModes": {
+      "cards": "Cards",
+      "timeline": "Timeline"
+    },
+    "actions": {
+      "edit": "Edit transaction",
+      "delete": "Delete transaction"
+    },
+    "editDialog": {
+      "title": "Edit Transaction",
+      "description": "Description",
+      "descriptionPlaceholder": "Enter description",
+      "transactionDate": "Transaction Date",
+      "transactionType": "Transaction Type",
+      "amount": "Amount",
+      "amountPlaceholder": "0.00",
+      "save": "Save Changes",
+      "saving": "Saving...",
+      "cancel": "Cancel",
+      "success": "Transaction updated successfully",
+      "error": "Failed to update transaction",
+      "required": "This field is required",
+      "invalidValue": "Please enter a valid amount"
+    },
+    "deleteDialog": {
+      "title": "Delete Transaction?",
+      "message": "Are you sure you want to delete this transaction? This action cannot be undone.",
+      "descriptionLabel": "Description:",
+      "dateLabel": "Date:",
+      "amountLabel": "Amount:",
+      "confirm": "Delete",
+      "deleting": "Deleting...",
+      "cancel": "Cancel",
+      "success": "Transaction deleted successfully",
+      "error": "Failed to delete transaction"
+    },
+    "categories": {
+      "title": "Categories",
+      "manage": "Manage Categories",
+      "add": "Add Category",
+      "edit": "Edit Category",
+      "delete": "Delete Category",
+      "select": "Select Categories",
+      "name": "Category Name",
+      "namePlaceholder": "Enter category name",
+      "color": "Color",
+      "icon": "Icon",
+      "noCategories": "No categories yet",
+      "createFirst": "Create your first category to organize transactions",
+      "deleteConfirm": "Are you sure you want to delete this category?",
+      "deleteMessage": "This will remove the category from all transactions",
+      "inUse": "Used {count} times"
     }
   },
   "navigation": {

@@ -1,31 +1,65 @@
-export interface Recibo {
+// Transaction represents a financial transaction (withdrawal or deposit)
+export interface Transaction {
   id: string
   user_id: string
-  tipo_estabelecimento: string | null
-  nome_estabelecimento: string | null
-  cnpj: string | null
-  data_compra: string
-  valor_total: number
-  metodo_pagamento: string | null
-  itens_comprados: string | null
-  json_original: any
   chat_id: string | null
-  criado_em: string
+  description: string | null           // Renamed from: tipo_estabelecimento
+  transaction_date: string             // Renamed from: data_compra
+  transaction_type: 'withdrawal' | 'deposit'  // New field
+  amount: number                       // Renamed from: valor_total
+  original_json: any                   // Renamed from: json_original
+  created_at: string                   // Renamed from: criado_em
+  deleted_at?: string | null
 }
 
-export interface MonthlySpending {
+// For backward compatibility during migration (will be removed later)
+export type Recibo = Transaction
+
+// Category represents a user-defined category for organizing transactions
+export interface Category {
+  id: string
+  user_id: string
+  name: string
+  color: string | null
+  icon: string | null
+  created_at: string
+}
+
+// TransactionCategory represents the many-to-many relationship
+export interface TransactionCategory {
+  transaction_id: string
+  category_id: string
+}
+
+// Extended transaction with categories populated
+export interface TransactionWithCategories extends Transaction {
+  categories?: Category[]
+}
+
+// Monthly transaction summary (renamed from MonthlySpending)
+export interface MonthlyTransactionSummary {
   month: string
-  total_receipts: number
-  total_spent: number
-  avg_spent: number
+  transaction_type?: 'withdrawal' | 'deposit'
+  total_transactions: number           // Renamed from: total_receipts
+  total_amount: number                 // Renamed from: total_spent
+  avg_amount: number                   // Renamed from: avg_spent
 }
 
-export interface SpendingByType {
-  tipo_estabelecimento: string
-  receipt_count: number
-  total_spent: number
+// For backward compatibility during migration (will be removed later)
+export type MonthlySpending = MonthlyTransactionSummary
+
+// Transaction summary by description (renamed from SpendingByType)
+export interface TransactionByDescription {
+  description: string                  // Renamed from: tipo_estabelecimento
+  transaction_type?: 'withdrawal' | 'deposit'
+  transaction_count: number            // Renamed from: receipt_count
+  total_amount: number                 // Renamed from: total_spent
 }
 
+// For backward compatibility during migration (will be removed later)
+export type SpendingByType = TransactionByDescription
+
+// TelegramUser interface remains unchanged
 export interface TelegramUser {
   id: string
   user_id: string
@@ -38,6 +72,7 @@ export interface TelegramUser {
   updated_at: string
 }
 
+// UserLinkToken interface remains unchanged
 export interface UserLinkToken {
   id: string
   user_id: string

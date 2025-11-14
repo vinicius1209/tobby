@@ -1,4 +1,7 @@
-import type { Recibo } from "./types"
+import type { Transaction } from "./types"
+
+// For backward compatibility during migration
+type Recibo = Transaction
 
 /**
  * Check if a value is null, undefined, empty string, or the string "null"
@@ -37,71 +40,67 @@ export function formatDate(date: string | Date, options?: Intl.DateTimeFormatOpt
 }
 
 /**
- * Safely get establishment name with fallback
+ * Safely get transaction description with fallback
+ * Renamed from: getEstablishmentType
  */
-export function getEstablishmentName(recibo: Recibo, fallback: string = "Não Informado"): string {
-  if (!isNullish(recibo.nome_estabelecimento)) {
-    return capitalizeWords(recibo.nome_estabelecimento!.trim())
+export function getDescription(transaction: Transaction, fallback: string = "Outros"): string {
+  if (!isNullish(transaction.description)) {
+    return capitalizeWords(transaction.description!.trim())
   }
   return fallback
 }
 
 /**
- * Safely get establishment type with fallback
+ * Check if transaction description is available
+ * Renamed from: hasEstablishmentType
  */
-export function getEstablishmentType(recibo: Recibo, fallback: string = "Outros"): string {
-  if (!isNullish(recibo.tipo_estabelecimento)) {
-    return capitalizeWords(recibo.tipo_estabelecimento!.trim())
+export function hasDescription(transaction: Transaction): boolean {
+  return !isNullish(transaction.description)
+}
+
+/**
+ * Get transaction type label (translated)
+ */
+export function getTransactionTypeLabel(type: 'withdrawal' | 'deposit', locale: string = 'pt-BR'): string {
+  const labels = {
+    'pt-BR': {
+      withdrawal: 'Retirada',
+      deposit: 'Depósito'
+    },
+    'en': {
+      withdrawal: 'Withdrawal',
+      deposit: 'Deposit'
+    }
   }
-  return fallback
+
+  return labels[locale as keyof typeof labels]?.[type] || type
 }
 
 /**
- * Safely get payment method with fallback
+ * Check if transaction is a deposit (income)
  */
-export function getPaymentMethod(recibo: Recibo, fallback: string = "Não Informado"): string {
-  if (!isNullish(recibo.metodo_pagamento)) {
-    return capitalizeWords(recibo.metodo_pagamento!.trim())
-  }
-  return fallback
+export function isDeposit(transaction: Transaction): boolean {
+  return transaction.transaction_type === 'deposit'
 }
 
 /**
- * Check if establishment name is available
+ * Check if transaction is a withdrawal (expense)
  */
-export function hasEstablishmentName(recibo: Recibo): boolean {
-  return !isNullish(recibo.nome_estabelecimento)
+export function isWithdrawal(transaction: Transaction): boolean {
+  return transaction.transaction_type === 'withdrawal'
 }
 
 /**
- * Check if establishment type is available
+ * Format transaction type for display with icon/color
  */
-export function hasEstablishmentType(recibo: Recibo): boolean {
-  return !isNullish(recibo.tipo_estabelecimento)
-}
-
-/**
- * Check if payment method is available
- */
-export function hasPaymentMethod(recibo: Recibo): boolean {
-  return !isNullish(recibo.metodo_pagamento)
-}
-
-/**
- * Check if items are available
- */
-export function hasItems(recibo: Recibo): boolean {
-  return !isNullish(recibo.itens_comprados)
-}
-
-/**
- * Get items with fallback
- */
-export function getItems(recibo: Recibo, fallback: string = "Sem Detalhes"): string {
-  if (!isNullish(recibo.itens_comprados)) {
-    return capitalizeWords(recibo.itens_comprados!.trim())
-  }
-  return fallback
+export function formatTransactionType(transaction: Transaction): {
+  label: string
+  color: string
+  icon: string
+} {
+  return isDeposit(transaction)
+    ? { label: 'Depósito', color: 'text-green-600', icon: 'ArrowDownCircle' }
+    : { label: 'Retirada', color: 'text-red-600', icon: 'ArrowUpCircle' }
 }
 
 /**
@@ -133,4 +132,123 @@ export function capitalizeWords(str: string): string {
     .split(' ')
     .map(word => word.charAt(0).toUpperCase() + word.slice(1))
     .join(' ')
+}
+
+/**
+ * Calculate transaction metrics for advanced cards
+ */
+
+/**
+ * Calculate the percentage this transaction represents of the total month amount
+ * Updated to use: amount (was valor_total)
+ */
+export function calculateMonthPercentage(transaction: Transaction, monthTotal: number): number {
+  if (monthTotal === 0) return 0
+  return (transaction.amount / monthTotal) * 100
+}
+
+/**
+ * Calculate frequency of similar transactions (same description)
+ * Updated to use: description (was tipo_estabelecimento)
+ */
+export function calculateFrequency(transaction: Transaction, allTransactions: Transaction[]): number {
+  const desc = transaction.description?.toLowerCase().trim()
+  if (!desc) return 1
+
+  return allTransactions.filter(
+    (t) => t.description?.toLowerCase().trim() === desc
+  ).length
+}
+
+/**
+ * Calculate trend (% change from previous month for same description)
+ * Updated to use: transaction_date (was data_compra), description (was tipo_estabelecimento), amount (was valor_total)
+ */
+export function calculateTrend(transaction: Transaction, allTransactions: Transaction[]): number {
+  const currentDate = new Date(transaction.transaction_date)
+  const currentMonth = currentDate.getMonth()
+  const currentYear = currentDate.getFullYear()
+  const desc = transaction.description?.toLowerCase().trim()
+
+  if (!desc) return 0
+
+  // Get previous month
+  const previousMonth = currentMonth === 0 ? 11 : currentMonth - 1
+  const previousYear = currentMonth === 0 ? currentYear - 1 : currentYear
+
+  // Calculate total for current month (same description)
+  const currentMonthTotal = allTransactions
+    .filter((t) => {
+      const date = new Date(t.transaction_date)
+      return (
+        date.getMonth() === currentMonth &&
+        date.getFullYear() === currentYear &&
+        t.description?.toLowerCase().trim() === desc
+      )
+    })
+    .reduce((sum, t) => sum + t.amount, 0)
+
+  // Calculate total for previous month (same description)
+  const previousMonthTotal = allTransactions
+    .filter((t) => {
+      const date = new Date(t.transaction_date)
+      return (
+        date.getMonth() === previousMonth &&
+        date.getFullYear() === previousYear &&
+        t.description?.toLowerCase().trim() === desc
+      )
+    })
+    .reduce((sum, t) => sum + t.amount, 0)
+
+  if (previousMonthTotal === 0) return 0
+
+  // Calculate percentage change
+  return ((currentMonthTotal - previousMonthTotal) / previousMonthTotal) * 100
+}
+
+/**
+ * Get month total amount from transactions
+ * Updated to use: transaction_date (was data_compra), amount (was valor_total)
+ */
+export function getMonthTotal(transactions: Transaction[], month: number, year: number): number {
+  return transactions
+    .filter((t) => {
+      const date = new Date(t.transaction_date)
+      return date.getMonth() === month && date.getFullYear() === year
+    })
+    .reduce((sum, t) => sum + t.amount, 0)
+}
+
+// ============================================================================
+// BACKWARD COMPATIBILITY FUNCTIONS (will be removed after migration)
+// ============================================================================
+
+/**
+ * @deprecated Use getDescription instead. This is kept for backward compatibility.
+ */
+export function getEstablishmentType(recibo: Recibo, fallback: string = "Outros"): string {
+  return getDescription(recibo, fallback)
+}
+
+/**
+ * @deprecated Use hasDescription instead. This is kept for backward compatibility.
+ */
+export function hasEstablishmentType(recibo: Recibo): boolean {
+  return hasDescription(recibo)
+}
+
+/**
+ * @deprecated Field nome_estabelecimento was removed. Use description instead.
+ */
+export function getEstablishmentName(recibo: Recibo, fallback: string = "Não Informado"): string {
+  console.warn('getEstablishmentName is deprecated. Use transaction.description instead.')
+  return getDescription(recibo, fallback)
+}
+
+/**
+ * @deprecated Field nome_estabelecimento was removed.
+ */
+export function hasEstablishmentName(recibo: Recibo): boolean {
+  console.warn('hasEstablishmentName is deprecated. Use hasDescription instead.')
+  return hasDescription(recibo)
 }

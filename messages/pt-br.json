@@ -62,16 +62,16 @@
     "subtitle": "Deixe o Tobby te ajudar a gerenciar suas finanças",
     "viewAnalytics": "Ver Análises",
     "recentExpenses": "Transações Recentes",
-    "noExpensesMatchFilters": "Nenhuma despesa corresponde aos seus filtros",
-    "noExpensesToDisplay": "Nenhuma despesa para exibir",
+    "noTransactionsMatchFilters": "Nenhuma transação corresponde aos seus filtros",
+    "noTransactionsToDisplay": "Nenhuma transação para exibir",
     "stats": {
       "totalSpent": "Total Gasto",
       "thisMonth": "Este Mês",
-      "totalReceipts": "Total de Recibos",
-      "avgExpense": "Gasto Médio",
+      "totalTransactions": "Total de Transações",
+      "avgTransaction": "Transação Média",
       "filteredResults": "Resultados filtrados",
-      "receipts": "recibos",
-      "perReceipt": "Por recibo"
+      "transactions": "transações",
+      "perTransaction": "Por transação"
     },
     "telegram": {
       "connectTitle": "Conecte sua conta do Telegram",
@@ -181,18 +181,21 @@
       "vsPreviousMonth": "vs mês ant."
     },
     "timeline": {
-      "title": "Timeline de Gastos",
-      "description": "Últimos {limit} gastos registrados",
-      "historicalDescription": "Histórico cronológico dos seus gastos",
-      "noExpenses": "Nenhum gasto registrado ainda",
-      "total": "Total dos últimos {count} gastos"
+      "title": "Timeline de Transações",
+      "description": "Últimas {limit} transações registradas",
+      "historicalDescription": "Histórico cronológico das suas transações",
+      "noTransactions": "Nenhuma transação registrada ainda",
+      "total": "Total das últimas {count} transações"
     },
     "filters": {
-      "search": "Buscar despesas...",
-      "searchPlaceholder": "Buscar por estabelecimento ou itens...",
-      "establishmentType": "Tipo de Estabelecimento",
+      "search": "Buscar transações...",
+      "searchPlaceholder": "Buscar por descrição...",
+      "description": "Descrição",
+      "allDescriptions": "Todas as descrições",
+      "transactionType": "Tipo de Transação",
       "allTypes": "Todos os tipos",
-      "paymentMethod": "Método de Pagamento",
+      "withdrawal": "Retirada",
+      "deposit": "Depósito",
       "dateRange": "Período",
       "from": "De",
       "to": "Até",
@@ -215,12 +218,12 @@
       }
     },
     "listHeader": {
-      "establishment": "Estabelecimento",
+      "description": "Descrição",
       "date": "Data",
       "impact": "Impacto",
       "frequency": "Frequência",
       "trend": "Tendência",
-      "value": "Valor"
+      "amount": "Valor"
     },
     "viewModes": {
       "cards": "Cards",
@@ -232,11 +235,12 @@
     },
     "editDialog": {
       "title": "Editar Transação",
-      "establishment": "Estabelecimento",
-      "establishmentPlaceholder": "Digite o nome do estabelecimento",
-      "date": "Data da Compra",
-      "value": "Valor Total",
-      "valuePlaceholder": "0,00",
+      "description": "Descrição",
+      "descriptionPlaceholder": "Digite a descrição",
+      "transactionDate": "Data da Transação",
+      "transactionType": "Tipo de Transação",
+      "amount": "Valor",
+      "amountPlaceholder": "0,00",
       "save": "Salvar Alterações",
       "saving": "Salvando...",
       "cancel": "Cancelar",
@@ -247,10 +251,10 @@
     },
     "deleteDialog": {
       "title": "Excluir Transação?",
-      "description": "Tem certeza que deseja excluir esta transação? Esta ação não pode ser desfeita.",
-      "establishmentLabel": "Estabelecimento:",
+      "message": "Tem certeza que deseja excluir esta transação? Esta ação não pode ser desfeita.",
+      "descriptionLabel": "Descrição:",
       "dateLabel": "Data:",
-      "valueLabel": "Valor:",
+      "amountLabel": "Valor:",
       "confirm": "Excluir",
       "deleting": "Excluindo...",
       "cancel": "Cancelar",

@@ -20,7 +20,32 @@
     "notInformed": "Não Informado",
     "noDetails": "Sem Detalhes",
     "pickDate": "Escolha uma data",
-    "user": "Usuário"
+    "user": "Usuário",
+    "day": "Dia",
+    "days": "Dias",
+    "weekdays": {
+      "sunday": "Domingo",
+      "monday": "Segunda-feira",
+      "tuesday": "Terça-feira",
+      "wednesday": "Quarta-feira",
+      "thursday": "Quinta-feira",
+      "friday": "Sexta-feira",
+      "saturday": "Sábado"
+    },
+    "months": {
+      "january": "Janeiro",
+      "february": "Fevereiro",
+      "march": "Março",
+      "april": "Abril",
+      "may": "Maio",
+      "june": "Junho",
+      "july": "Julho",
+      "august": "Agosto",
+      "september": "Setembro",
+      "october": "Outubro",
+      "november": "Novembro",
+      "december": "Dezembro"
+    }
   },
   "auth": {
     "login": {
@@ -260,17 +285,103 @@
       "cancel": "Cancelar",
       "success": "Transação excluída com sucesso",
       "error": "Falha ao excluir transação"
+    },
+    "categories": {
+      "title": "Categorias",
+      "manage": "Gerenciar Categorias",
+      "add": "Adicionar Categoria",
+      "edit": "Editar Categoria",
+      "delete": "Excluir Categoria",
+      "select": "Selecionar Categorias",
+      "name": "Nome da Categoria",
+      "namePlaceholder": "Digite o nome da categoria",
+      "color": "Cor",
+      "icon": "Ícone",
+      "noCategories": "Nenhuma categoria ainda",
+      "createFirst": "Crie sua primeira categoria para organizar suas transações",
+      "deleteConfirm": "Tem certeza que deseja excluir esta categoria?",
+      "deleteMessage": "Isso removerá a categoria de todas as transações",
+      "inUse": "Usada {count} vezes"
     }
   },
   "navigation": {
     "dashboard": "Painel",
+    "transactions": "Transações",
+    "categories": "Categorias",
+    "recurringIncome": "Ganhos Recorrentes",
     "analytics": "Análises",
     "premium": "Premium",
     "settings": "Configurações",
     "billing": "Cobrança",
     "signOut": "Sair",
+    "loggingOut": "Saindo...",
     "upgrade": "Atualizar",
-    "comingSoon": "Em Breve"
+    "comingSoon": "Em Breve",
+    "menu": "Menu",
+    "tagline": "Companheiro Financeiro",
+    "user": "Usuário",
+    "account": "Gerenciar conta"
+  },
+  "recurringIncome": {
+    "title": "Ganhos Recorrentes",
+    "subtitle": "Gerencie suas fontes de renda recorrentes",
+    "add": "Adicionar Ganho Recorrente",
+    "edit": "Editar Ganho Recorrente",
+    "delete": "Excluir Ganho Recorrente",
+    "noIncome": "Nenhum ganho recorrente ainda",
+    "noIncomeDescription": "Comece adicionando sua primeira fonte de renda recorrente",
+    "active": "Ativo",
+    "inactive": "Inativo",
+    "lastGenerated": "Última geração",
+    "nextGeneration": "Próxima geração",
+    "frequency": {
+      "label": "Frequência",
+      "monthly": "Mensal",
+      "biweekly": "Quinzenal",
+      "weekly": "Semanal",
+      "yearly": "Anual"
+    },
+    "form": {
+      "add": "Adicionar Ganho Recorrente",
+      "edit": "Editar Ganho Recorrente",
+      "description": "Descrição",
+      "descriptionPlaceholder": "ex: Salário Mensal",
+      "amount": "Valor",
+      "amountPlaceholder": "0,00",
+      "type": "Tipo de Transação",
+      "startDate": "Data de Início",
+      "endDate": "Data de Término (Opcional)",
+      "endDatePlaceholder": "Deixe vazio para sem fim",
+      "frequencyType": "Frequência",
+      "dayOfMonth": "Dia do Mês",
+      "dayOfMonthPlaceholder": "1-31",
+      "daysOfMonth": "Dias do Mês",
+      "dayOfMonthFirst": "Primeiro Dia",
+      "dayOfMonthSecond": "Segundo Dia",
+      "dayOfWeek": "Dia da Semana",
+      "month": "Mês",
+      "monthPlaceholder": "Selecione o mês",
+      "save": "Salvar",
+      "saving": "Salvando...",
+      "cancel": "Cancelar",
+      "required": "Este campo é obrigatório",
+      "invalidAmount": "Digite um valor válido"
+    },
+    "deleteDialog": {
+      "title": "Excluir Ganho Recorrente?",
+      "message": "Tem certeza que deseja excluir este ganho recorrente? Isso não excluirá as transações já geradas.",
+      "confirm": "Excluir",
+      "cancel": "Cancelar"
+    },
+    "status": {
+      "pauseTitle": "Pausar Ganho Recorrente?",
+      "pauseMessage": "Isso parará a geração de novas transações até você ativá-lo novamente.",
+      "activateTitle": "Ativar Ganho Recorrente?",
+      "activateMessage": "Isso retomará a geração de transações conforme o agendamento.",
+      "pause": "Pausar",
+      "activate": "Ativar",
+      "cancel": "Cancelar"
+    }
   },
   "footer": {
     "product": "Produto",

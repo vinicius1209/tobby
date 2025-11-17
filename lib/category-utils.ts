@@ -60,18 +60,20 @@ export async function getTransactionCategories(
  */
 export async function createCategory(
   supabase: SupabaseClient,
-  userId: string,
-  name: string,
-  color?: string,
-  icon?: string
+  category: {
+    user_id: string
+    name: string
+    color?: string
+    icon?: string
+  }
 ): Promise<Category | null> {
   const { data, error } = await supabase
     .from("categories")
     .insert({
-      user_id: userId,
-      name: name.trim(),
-      color: color || "#808080",
-      icon: icon || "Store",
+      user_id: category.user_id,
+      name: category.name.trim(),
+      color: category.color || "#808080",
+      icon: category.icon || "Tag",
     })
     .select()
     .single()
@@ -95,20 +97,18 @@ export async function updateCategory(
     color?: string
     icon?: string
   }
-): Promise<Category | null> {
-  const { data, error } = await supabase
+): Promise<boolean> {
+  const { error } = await supabase
     .from("categories")
     .update(updates)
     .eq("id", categoryId)
-    .select()
-    .single()
 
   if (error) {
     console.error("Error updating category:", error)
-    return null
+    return false
   }
 
-  return data as Category
+  return true
 }
 
 /**

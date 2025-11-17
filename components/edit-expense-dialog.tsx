@@ -2,7 +2,9 @@
 
 import { useState, useEffect } from "react"
 import { useTranslations } from "next-intl"
-import type { Recibo } from "@/lib/types"
+import type { Recibo, Category } from "@/lib/types"
+import { getSupabaseBrowserClient } from "@/lib/supabase/client"
+import { getTransactionCategories, assignCategories } from "@/lib/category-utils"
 import {
   Dialog,
   DialogContent,
@@ -15,13 +17,14 @@ import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { DatePicker } from "@/components/date-picker"
+import { CategorySelector } from "@/components/category-selector"
 import { Loader2 } from "lucide-react"
 
 interface EditExpenseDialogProps {
   open: boolean
   onOpenChange: (open: boolean) => void
   recibo: Recibo
-  onSave: (updates: Partial<Recibo>) => Promise<void>
+  onSave: (updates: Partial<Recibo>, categories: Category[]) => Promise<void>
 }
 
 export function EditExpenseDialog({
@@ -31,6 +34,8 @@ export function EditExpenseDialog({
   onSave,
 }: EditExpenseDialogProps) {
   const t = useTranslations('transactions.editDialog')
+  const tCat = useTranslations('transactions.categories')
+  const supabase = getSupabaseBrowserClient()
   const [isSaving, setIsSaving] = useState(false)
   const [errors, setErrors] = useState<Record<string, string>>({})
 
@@ -40,6 +45,7 @@ export function EditExpenseDialog({
     recibo.transaction_date ? new Date(recibo.transaction_date) : undefined
   )
   const [amount, setAmount] = useState(recibo.amount.toString())
+  const [selectedCategories, setSelectedCategories] = useState<Category[]>([])
 
   // Reset form when dialog opens with new recibo
   useEffect(() => {
@@ -48,8 +54,16 @@ export function EditExpenseDialog({
       setDate(recibo.transaction_date ? new Date(recibo.transaction_date) : undefined)
       setAmount(recibo.amount.toString())
       setErrors({})
+
+      // Load categories for this transaction
+      const loadCategories = async () => {
+        const categories = await getTransactionCategories(supabase, recibo.id)
+        setSelectedCategories(categories)
+      }
+
+      loadCategories()
     }
-  }, [open, recibo])
+  }, [open, recibo, supabase])
 
   const validateForm = () => {
     const newErrors: Record<string, string> = {}
@@ -84,7 +98,13 @@ export function EditExpenseDialog({
         amount: parseFloat(amount),
       }
 
-      await onSave(updates)
+      // Save categories first
+      const categoryIds = selectedCategories.map(c => c.id)
+      await assignCategories(supabase, recibo.id, categoryIds)
+
+      // Then call onSave with updates AND categories
+      await onSave(updates, selectedCategories)
+
       onOpenChange(false)
     } catch (error) {
       console.error("Error saving expense:", error)
@@ -175,6 +195,16 @@ export function EditExpenseDialog({
             {errors.amount && (
               <p className="text-sm text-red-500">{errors.amount}</p>
             )}
+          </div>
+
+          {/* Categories */}
+          <div className="space-y-2">
+            <CategorySelector
+              selectedCategories={selectedCategories}
+              onSelectionChange={setSelectedCategories}
+              label={tCat('select')}
+              placeholder={tCat('select')}
+            />
           </div>
         </div>
 

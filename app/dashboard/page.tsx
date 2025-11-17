@@ -4,7 +4,7 @@ import { useState, useEffect } from "react"
 import { useRouter } from "next/navigation"
 import { useTranslations } from "next-intl"
 import { getSupabaseBrowserClient } from "@/lib/supabase/client"
-import { DashboardHeader } from "@/components/dashboard-header"
+import { DashboardShell } from "@/components/dashboard-shell"
 import { ExpenseCardAdvanced } from "@/components/expense-card-advanced"
 import { ExpenseListHeader } from "@/components/expense-list-header"
 import { ExpensesTimeline } from "@/components/expenses-timeline"
@@ -13,8 +13,7 @@ import { ExpenseFilters, type FilterState } from "@/components/expense-filters"
 import { TelegramLinkDialog } from "@/components/telegram-link-dialog"
 import { EditExpenseDialog } from "@/components/edit-expense-dialog"
 import { DeleteExpenseDialog } from "@/components/delete-expense-dialog"
-import { Footer } from "@/components/footer"
-import type { Recibo } from "@/lib/types"
+import type { Recibo, Category } from "@/lib/types"
 import {
   formatCurrency,
   getUniqueValues,
@@ -23,7 +22,7 @@ import {
   calculateTrend,
   getMonthTotal,
 } from "@/lib/format-utils"
-import { Receipt, TrendingUp, Calendar, CreditCard, Link2, Filter } from "lucide-react"
+import { Receipt, TrendingUp, Calendar, CreditCard, Link2, Filter, RefreshCw } from "lucide-react"
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert"
 import { InfoIcon } from "lucide-react"
 import { Button } from "@/components/ui/button"
@@ -51,6 +50,13 @@ export default function DashboardPage() {
   const [sortOrder, setSortOrder] = useState<"asc" | "desc">("desc")
   const [editingRecibo, setEditingRecibo] = useState<Recibo | null>(null)
   const [deletingRecibo, setDeletingRecibo] = useState<Recibo | null>(null)
+  const [currentFilters, setCurrentFilters] = useState<FilterState>({
+    searchTerm: "",
+    establishmentType: "all",
+    dateFrom: "",
+    dateTo: "",
+  })
+  const [isRefreshing, setIsRefreshing] = useState(false)
   const router = useRouter()
   const supabase = getSupabaseBrowserClient()
 
@@ -93,9 +99,15 @@ export default function DashboardPage() {
       }
 
       // Now fetch transactions filtered by the user's chat_id and not soft-deleted
+      // Include categories via JOIN
       const { data, error } = await supabase
         .from("user_transactions")
-        .select("*")
+        .select(`
+          *,
+          transaction_categories(
+            categories(*)
+          )
+        `)
         .eq("chat_id", telegramUser.chat_id)
         .is("deleted_at", null)
         .order("transaction_date", { ascending: false })
@@ -103,8 +115,16 @@ export default function DashboardPage() {
       if (error) {
         console.error("[v0] Error fetching receipts:", error)
       } else {
-        setReceipts((data as Recibo[]) || [])
-        setFilteredReceipts((data as Recibo[]) || [])
+        // Transform data to include categories array
+        const receiptsWithCategories = (data || []).map((transaction: any) => ({
+          ...transaction,
+          categories: transaction.transaction_categories
+            ?.map((tc: any) => tc.categories)
+            .filter(Boolean) || []
+        }))
+
+        setReceipts(receiptsWithCategories as Recibo[])
+        setFilteredReceipts(receiptsWithCategories as Recibo[])
       }
       setLoading(false)
     }
@@ -113,6 +133,9 @@ export default function DashboardPage() {
   }, [router, supabase])
 
   const handleFilterChange = (filters: FilterState) => {
+    // Save current filters for refresh functionality
+    setCurrentFilters(filters)
+
     let filtered = [...receipts]
 
     // Search term filter
@@ -151,6 +174,70 @@ export default function DashboardPage() {
     }
   }
 
+  const handleRefreshReceipts = async () => {
+    setIsRefreshing(true)
+
+    try {
+      const {
+        data: { user },
+      } = await supabase.auth.getUser()
+
+      if (!user) {
+        router.push("/login")
+        return
+      }
+
+      // Get the user's telegram chat_id
+      const { data: telegramUser } = await supabase
+        .from("telegram_users")
+        .select("chat_id")
+        .eq("user_id", user.id)
+        .maybeSingle()
+
+      if (!telegramUser) {
+        setIsLinked(false)
+        setReceipts([])
+        setFilteredReceipts([])
+        setIsRefreshing(false)
+        return
+      }
+
+      // Fetch transactions with categories
+      const { data, error } = await supabase
+        .from("user_transactions")
+        .select(`
+          *,
+          transaction_categories(
+            categories(*)
+          )
+        `)
+        .eq("chat_id", telegramUser.chat_id)
+        .is("deleted_at", null)
+        .order("transaction_date", { ascending: false })
+
+      if (error) {
+        console.error("Error refreshing receipts:", error)
+      } else {
+        // Transform data to include categories array
+        const receiptsWithCategories = (data || []).map((transaction: any) => ({
+          ...transaction,
+          categories: transaction.transaction_categories
+            ?.map((tc: any) => tc.categories)
+            .filter(Boolean) || []
+        }))
+
+        setReceipts(receiptsWithCategories as Recibo[])
+
+        // Reapply current filters
+        handleFilterChange(currentFilters)
+      }
+    } catch (error) {
+      console.error("Failed to refresh receipts:", error)
+    } finally {
+      setIsRefreshing(false)
+    }
+  }
+
   const handleEditRecibo = (recibo: Recibo) => {
     setEditingRecibo(recibo)
   }
@@ -159,11 +246,11 @@ export default function DashboardPage() {
     setDeletingRecibo(recibo)
   }
 
-  const handleSaveEdit = async (updates: Partial<Recibo>) => {
+  const handleSaveEdit = async (updates: Partial<Recibo>, categories: Category[]) => {
     if (!editingRecibo) return
 
-    // Optimistic update - update local state immediately
-    const updatedRecibo = { ...editingRecibo, ...updates }
+    // Optimistic update - update local state immediately with categories
+    const updatedRecibo = { ...editingRecibo, ...updates, categories }
     setReceipts((prev) =>
       prev.map((r) => (r.id === editingRecibo.id ? updatedRecibo : r))
     )
@@ -282,21 +369,17 @@ export default function DashboardPage() {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-slate-50">
-        <DashboardHeader />
-        <main className="container mx-auto px-4 py-8">
-          <div className="flex items-center justify-center h-64">
-            <p className="text-muted-foreground">{tCommon('loading')}</p>
-          </div>
-        </main>
-      </div>
+      <DashboardShell breadcrumb={[{ label: t('title') }]}>
+        <div className="flex items-center justify-center h-64">
+          <p className="text-muted-foreground">{tCommon('loading')}</p>
+        </div>
+      </DashboardShell>
     )
   }
 
   return (
-    <div className="min-h-screen bg-slate-50">
-      <DashboardHeader />
-      <main className="container mx-auto px-4 py-8">
+    <DashboardShell breadcrumb={[{ label: t('title') }]}>
+      <div className="flex-1 space-y-4 p-8 pt-6">
         <div className="space-y-8">
           {/* Header */}
           <div>
@@ -377,6 +460,14 @@ export default function DashboardPage() {
                       <TabsTrigger value="cards">{tViewModes('cards')}</TabsTrigger>
                       <TabsTrigger value="timeline">{tViewModes('timeline')}</TabsTrigger>
                     </TabsList>
+                    <Button
+                      variant="outline"
+                      size="icon"
+                      onClick={handleRefreshReceipts}
+                      disabled={isRefreshing}
+                    >
+                      <RefreshCw className={`h-4 w-4 ${isRefreshing ? 'animate-spin' : ''}`} />
+                    </Button>
                     <Sheet>
                       <SheetTrigger asChild>
                         <Button variant="outline" size="icon">
@@ -415,6 +506,7 @@ export default function DashboardPage() {
                             <ExpenseCardAdvanced
                               key={recibo.id}
                               recibo={recibo}
+                              categories={recibo.categories || []}
                               monthPercentage={monthPercentage}
                               frequency={frequency}
                               trend={trend}
@@ -454,7 +546,7 @@ export default function DashboardPage() {
             )}
           </div>
         </div>
-      </main>
+      </div>
 
       {/* Telegram Link Dialog */}
       <TelegramLinkDialog
@@ -485,8 +577,6 @@ export default function DashboardPage() {
           onConfirm={handleConfirmDelete}
         />
       )}
-
-      <Footer />
-    </div>
+    </DashboardShell>
   )
 }

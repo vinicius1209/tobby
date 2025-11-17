@@ -3,6 +3,7 @@
 import type { Recibo } from "@/lib/types"
 import { formatCurrency, formatDate, getDescription, hasDescription } from "@/lib/format-utils"
 import { Badge } from "@/components/ui/badge"
+import { CategoryBadge } from "@/components/category-badge"
 import { TrendingUp } from "lucide-react"
 import { useTranslations } from "next-intl"
 
@@ -98,6 +99,25 @@ export function ExpensesTimeline({ receipts, limit = 10 }: ExpensesTimelineProps
                         <span className="text-xs text-muted-foreground">{time}</span>
                       </div>
                       <p className="font-medium text-sm truncate">{description}</p>
+
+                      {/* Category badges - subtle display */}
+                      {receipt.categories && receipt.categories.length > 0 && (
+                        <div className="flex gap-1 flex-wrap mt-2">
+                          {receipt.categories.slice(0, 2).map((category) => (
+                            <CategoryBadge
+                              key={category.id}
+                              category={category}
+                              size="sm"
+                              variant="outline"
+                            />
+                          ))}
+                          {receipt.categories.length > 2 && (
+                            <Badge variant="outline" className="text-xs h-5 px-1.5">
+                              +{receipt.categories.length - 2}
+                            </Badge>
+                          )}
+                        </div>
+                      )}
                     </div>
                     <div className="shrink-0">
                       <p className="font-semibold text-sm">{formatCurrency(receipt.amount)}</p>

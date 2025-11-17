@@ -2,21 +2,24 @@
 
 import { Card, CardContent } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
-import type { Recibo } from "@/lib/types"
+import type { Recibo, Category } from "@/lib/types"
 import {
   formatCurrency,
   formatDate,
   getDescription,
   hasDescription,
 } from "@/lib/format-utils"
-import { Calendar, FileText } from "lucide-react"
+import { Calendar, FileText, ArrowUp, ArrowDown } from "lucide-react"
 import { useTranslations } from "next-intl"
+import { CategoryBadge } from "@/components/category-badge"
+import { cn } from "@/lib/utils"
 
 interface ExpenseCardProps {
   recibo: Recibo
+  categories?: Category[]
 }
 
-export function ExpenseCard({ recibo }: ExpenseCardProps) {
+export function ExpenseCard({ recibo, categories = [] }: ExpenseCardProps) {
   const tCommon = useTranslations('common')
 
   const formattedDate = formatDate(recibo.transaction_date)
@@ -34,6 +37,20 @@ export function ExpenseCard({ recibo }: ExpenseCardProps) {
               <h3 className="font-semibold">{description}</h3>
             </div>
 
+            {/* Categories */}
+            {categories.length > 0 && (
+              <div className="flex gap-1 flex-wrap">
+                {categories.slice(0, 3).map((category) => (
+                  <CategoryBadge key={category.id} category={category} size="sm" />
+                ))}
+                {categories.length > 3 && (
+                  <Badge variant="secondary" className="text-xs">
+                    +{categories.length - 3}
+                  </Badge>
+                )}
+              </div>
+            )}
+
             {/* Date */}
             <div className="flex items-center gap-1 text-xs text-muted-foreground">
               <Calendar className="h-3 w-3" />
@@ -42,8 +59,18 @@ export function ExpenseCard({ recibo }: ExpenseCardProps) {
           </div>
 
           {/* Value */}
-          <div className="text-right">
-            <p className="text-2xl font-bold">{formattedValue}</p>
+          <div className="text-right flex items-center gap-1">
+            {recibo.transaction_type === 'deposit' ? (
+              <ArrowUp className="h-5 w-5 text-green-600" />
+            ) : (
+              <ArrowDown className="h-5 w-5 text-red-600" />
+            )}
+            <p className={cn(
+              "text-2xl font-bold",
+              recibo.transaction_type === 'deposit' ? 'text-green-600' : 'text-red-600'
+            )}>
+              {formattedValue}
+            </p>
           </div>
         </div>
       </CardContent>

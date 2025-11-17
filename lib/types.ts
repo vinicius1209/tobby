@@ -12,9 +12,6 @@ export interface Transaction {
   deleted_at?: string | null
 }
 
-// For backward compatibility during migration (will be removed later)
-export type Recibo = Transaction
-
 // Category represents a user-defined category for organizing transactions
 export interface Category {
   id: string
@@ -35,6 +32,10 @@ export interface TransactionCategory {
 export interface TransactionWithCategories extends Transaction {
   categories?: Category[]
 }
+
+// For backward compatibility during migration (will be removed later)
+// Updated to use TransactionWithCategories to include categories support
+export type Recibo = TransactionWithCategories
 
 // Monthly transaction summary (renamed from MonthlySpending)
 export interface MonthlyTransactionSummary {
@@ -80,4 +81,67 @@ export interface UserLinkToken {
   created_at: string
   expires_at: string
   used_at: string | null
+}
+
+// ============================================================================
+// RECURRING TRANSACTIONS TYPES
+// ============================================================================
+
+// Frequency types for recurring transactions
+export type FrequencyType = 'monthly' | 'biweekly' | 'weekly' | 'yearly'
+
+// Configuration for different frequency types
+export interface MonthlyFrequencyConfig {
+  day: number // Day of month (1-31)
+}
+
+export interface BiweeklyFrequencyConfig {
+  days: [number, number] // Two days of month (e.g., [1, 15])
+}
+
+export interface WeeklyFrequencyConfig {
+  weekday: number // Day of week (0=Sunday, 6=Saturday)
+}
+
+export interface YearlyFrequencyConfig {
+  month: number // Month (1-12)
+  day: number // Day of month (1-31)
+}
+
+// Union type for all frequency configs
+export type FrequencyConfig =
+  | MonthlyFrequencyConfig
+  | BiweeklyFrequencyConfig
+  | WeeklyFrequencyConfig
+  | YearlyFrequencyConfig
+
+// Recurring transaction rule
+export interface RecurringTransaction {
+  id: string
+  user_id: string
+  description: string
+  amount: number
+  transaction_type: 'withdrawal' | 'deposit'
+  frequency_type: FrequencyType
+  frequency_config: FrequencyConfig
+  start_date: string // ISO date string
+  end_date?: string | null // ISO date string or null for no end
+  is_active: boolean
+  last_generated_date?: string | null // ISO date string
+  created_at: string
+  updated_at: string
+}
+
+// Log of generated transactions
+export interface TransactionGenerationLog {
+  id: string
+  recurring_transaction_id: string
+  generated_transaction_id: string
+  generated_for_date: string // ISO date string
+  generated_at: string
+}
+
+// Extended recurring transaction with generation logs
+export interface RecurringTransactionWithLogs extends RecurringTransaction {
+  generation_logs?: TransactionGenerationLog[]
 }

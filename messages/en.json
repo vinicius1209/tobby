@@ -20,7 +20,32 @@
     "notInformed": "Not Informed",
     "noDetails": "No Details",
     "pickDate": "Pick a date",
-    "user": "User"
+    "user": "User",
+    "day": "Day",
+    "days": "Days",
+    "weekdays": {
+      "sunday": "Sunday",
+      "monday": "Monday",
+      "tuesday": "Tuesday",
+      "wednesday": "Wednesday",
+      "thursday": "Thursday",
+      "friday": "Friday",
+      "saturday": "Saturday"
+    },
+    "months": {
+      "january": "January",
+      "february": "February",
+      "march": "March",
+      "april": "April",
+      "may": "May",
+      "june": "June",
+      "july": "July",
+      "august": "August",
+      "september": "September",
+      "october": "October",
+      "november": "November",
+      "december": "December"
+    }
   },
   "auth": {
     "login": {
@@ -281,13 +306,82 @@
   },
   "navigation": {
     "dashboard": "Dashboard",
+    "transactions": "Transactions",
+    "categories": "Categories",
+    "recurringIncome": "Recurring Income",
     "analytics": "Analytics",
     "premium": "Premium",
     "settings": "Settings",
     "billing": "Billing",
     "signOut": "Sign out",
+    "loggingOut": "Signing out...",
     "upgrade": "Upgrade",
-    "comingSoon": "Coming Soon"
+    "comingSoon": "Coming Soon",
+    "menu": "Menu",
+    "tagline": "Financial Companion",
+    "user": "User",
+    "account": "Manage account"
+  },
+  "recurringIncome": {
+    "title": "Recurring Income",
+    "subtitle": "Manage your recurring income sources",
+    "add": "Add Recurring Income",
+    "edit": "Edit Recurring Income",
+    "delete": "Delete Recurring Income",
+    "noIncome": "No recurring income yet",
+    "noIncomeDescription": "Start by adding your first recurring income source",
+    "active": "Active",
+    "inactive": "Inactive",
+    "lastGenerated": "Last generated",
+    "nextGeneration": "Next generation",
+    "frequency": {
+      "label": "Frequency",
+      "monthly": "Monthly",
+      "biweekly": "Biweekly",
+      "weekly": "Weekly",
+      "yearly": "Yearly"
+    },
+    "form": {
+      "add": "Add Recurring Income",
+      "edit": "Edit Recurring Income",
+      "description": "Description",
+      "descriptionPlaceholder": "e.g., Monthly Salary",
+      "amount": "Amount",
+      "amountPlaceholder": "0.00",
+      "type": "Transaction Type",
+      "startDate": "Start Date",
+      "endDate": "End Date (Optional)",
+      "endDatePlaceholder": "Leave empty for no end date",
+      "frequencyType": "Frequency",
+      "dayOfMonth": "Day of Month",
+      "dayOfMonthPlaceholder": "1-31",
+      "daysOfMonth": "Days of Month",
+      "dayOfMonthFirst": "First Day",
+      "dayOfMonthSecond": "Second Day",
+      "dayOfWeek": "Day of Week",
+      "month": "Month",
+      "monthPlaceholder": "Select month",
+      "save": "Save",
+      "saving": "Saving...",
+      "cancel": "Cancel",
+      "required": "This field is required",
+      "invalidAmount": "Please enter a valid amount"
+    },
+    "deleteDialog": {
+      "title": "Delete Recurring Income?",
+      "message": "Are you sure you want to delete this recurring income? This will not delete previously generated transactions.",
+      "confirm": "Delete",
+      "cancel": "Cancel"
+    },
+    "status": {
+      "pauseTitle": "Pause Recurring Income?",
+      "pauseMessage": "This will stop generating new transactions until you activate it again.",
+      "activateTitle": "Activate Recurring Income?",
+      "activateMessage": "This will resume generating transactions based on the schedule.",
+      "pause": "Pause",
+      "activate": "Activate",
+      "cancel": "Cancel"
+    }
   },
   "footer": {
     "product": "Product",

@@ -1,19 +1,21 @@
 "use client"
 
-import type { Recibo } from "@/lib/types"
+import type { Recibo, Category } from "@/lib/types"
 import {
   formatCurrency,
   formatDate,
   getDescription,
 } from "@/lib/format-utils"
-import { TrendingDown, TrendingUp, Pencil, Trash2 } from "lucide-react"
+import { TrendingDown, TrendingUp, Pencil, Trash2, ArrowUp, ArrowDown } from "lucide-react"
 import { useTranslations } from "next-intl"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
+import { CategoryBadge } from "@/components/category-badge"
 import { cn } from "@/lib/utils"
 
 interface ExpenseCardAdvancedProps {
   recibo: Recibo
+  categories?: Category[] // Categories for this transaction
   monthPercentage: number // Percentual deste gasto no mês total
   frequency: number // Quantas vezes este tipo de despesa apareceu
   trend: number // Variação % em relação ao mês anterior (positivo = aumentou, negativo = diminuiu)
@@ -24,6 +26,7 @@ interface ExpenseCardAdvancedProps {
 
 export function ExpenseCardAdvanced({
   recibo,
+  categories = [],
   monthPercentage,
   frequency,
   trend,
@@ -60,9 +63,21 @@ export function ExpenseCardAdvanced({
         gridTemplateColumns: "1fr 130px 100px 100px 110px 140px 80px",
       }}
     >
-      {/* Coluna 1: Description */}
-      <div className="min-w-0">
+      {/* Coluna 1: Description + Categories */}
+      <div className="min-w-0 space-y-1">
         <h4 className="font-semibold text-base truncate">{description}</h4>
+        {categories.length > 0 && (
+          <div className="flex gap-1 flex-wrap">
+            {categories.slice(0, 2).map((category) => (
+              <CategoryBadge key={category.id} category={category} size="sm" />
+            ))}
+            {categories.length > 2 && (
+              <Badge variant="secondary" className="text-xs">
+                +{categories.length - 2}
+              </Badge>
+            )}
+          </div>
+        )}
       </div>
 
       {/* Coluna 2: Data (130px) */}
@@ -118,8 +133,18 @@ export function ExpenseCardAdvanced({
       </div>
 
       {/* Coluna 6: Valor (140px) */}
-      <div className="flex items-center justify-end">
-        <p className="text-xl font-bold text-red-600 tabular-nums">{formattedValue}</p>
+      <div className="flex items-center justify-end gap-1">
+        {recibo.transaction_type === 'deposit' ? (
+          <ArrowUp className="h-5 w-5 text-green-600" />
+        ) : (
+          <ArrowDown className="h-5 w-5 text-red-600" />
+        )}
+        <p className={cn(
+          "text-xl font-bold tabular-nums",
+          recibo.transaction_type === 'deposit' ? 'text-green-600' : 'text-red-600'
+        )}>
+          {formattedValue}
+        </p>
       </div>
 
       {/* Coluna 7: Ações (80px) */}

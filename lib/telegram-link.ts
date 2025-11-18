@@ -130,3 +130,36 @@ export async function getActiveToken(): Promise<{
 
   return { token: token as UserLinkToken | null, error: null }
 }
+
+/**
+ * Unlinks the user's Telegram account by deleting their telegram_users record
+ */
+export async function unlinkTelegramAccount(): Promise<{
+  success: boolean
+  error: string | null
+}> {
+  const supabase = getSupabaseBrowserClient()
+
+  // Get current user
+  const {
+    data: { user },
+    error: userError,
+  } = await supabase.auth.getUser()
+
+  if (userError || !user) {
+    return { success: false, error: "User not authenticated" }
+  }
+
+  // Delete the telegram_users record
+  const { error: deleteError } = await supabase
+    .from("telegram_users")
+    .delete()
+    .eq("user_id", user.id)
+
+  if (deleteError) {
+    console.error("Error unlinking telegram:", deleteError)
+    return { success: false, error: "Failed to unlink Telegram account" }
+  }
+
+  return { success: true, error: null }
+}

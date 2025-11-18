@@ -4,6 +4,7 @@ import { useState } from "react"
 import { useTranslations } from "next-intl"
 import type { Recibo } from "@/lib/types"
 import { formatCurrency, formatDate, getDescription } from "@/lib/format-utils"
+import { useToast } from "@/hooks/use-toast"
 import {
   AlertDialog,
   AlertDialogAction,
@@ -31,15 +32,31 @@ export function DeleteExpenseDialog({
 }: DeleteExpenseDialogProps) {
   const t = useTranslations('transactions.deleteDialog')
   const tCommon = useTranslations('common')
+  const tTobby = useTranslations('tobby.feedback')
+  const { toast } = useToast()
   const [isDeleting, setIsDeleting] = useState(false)
 
   const handleConfirm = async () => {
     setIsDeleting(true)
     try {
       await onConfirm()
+
+      // Show success toast
+      toast({
+        title: tTobby('deleted'),
+        description: t('success'),
+      })
+
       onOpenChange(false)
     } catch (error) {
       console.error("Error deleting expense:", error)
+
+      // Show error toast
+      toast({
+        title: tTobby('error'),
+        description: t('error'),
+        variant: "destructive",
+      })
     } finally {
       setIsDeleting(false)
     }

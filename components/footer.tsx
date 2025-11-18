@@ -3,6 +3,7 @@
 import Link from "next/link"
 import { useTranslations } from "next-intl"
 import { Github, Twitter, Mail } from "lucide-react"
+import { TobbyLogo } from "@/components/tobby-logo"
 
 export function Footer() {
   const currentYear = new Date().getFullYear()
@@ -17,7 +18,7 @@ export function Footer() {
           {/* Brand */}
           <div className="space-y-4">
             <div className="flex items-center gap-2">
-              <span className="text-2xl">🐕</span>
+              <TobbyLogo size={32} variant="happy" animated={true} />
               <span className="text-lg font-bold">{tBrand('name')}</span>
             </div>
             <p className="text-sm text-muted-foreground">

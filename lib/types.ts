@@ -145,3 +145,12 @@ export interface TransactionGenerationLog {
 export interface RecurringTransactionWithLogs extends RecurringTransaction {
   generation_logs?: TransactionGenerationLog[]
 }
+
+// User preferences for budget tracking and settings
+export interface UserPreferences {
+  id: string
+  user_id: string
+  monthly_budget: number
+  created_at: string
+  updated_at: string
+}

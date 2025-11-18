@@ -416,5 +416,75 @@
         "description": "Seus dados financeiros são criptografados e protegidos com segurança de nível empresarial"
       }
     }
+  },
+  "tobby": {
+    "states": {
+      "happy": "Muito bem! Você está no caminho certo! 🎯",
+      "neutral": "Continue assim! Dentro do orçamento 👍",
+      "worried": "Cuidado! Chegando perto do limite 💡",
+      "overBudget": "Acima do orçamento este mês 😟"
+    },
+    "celebration": {
+      "transactionSaved": "Eba! Transação salva! 🎉",
+      "transactionEdited": "Ótimo! Tudo atualizado! ✨",
+      "transactionDeleted": "Transação removida! 🗑️",
+      "budgetOnTrack": "Você está arrasando! 💪",
+      "firstTransaction": "Bem-vindo! Primeira transação registrada! 🎊"
+    },
+    "errors": {
+      "saveFailed": "Ops! Não consegui salvar. Tentar novamente? 🤔",
+      "deleteFailed": "Não foi possível excluir. Tente novamente.",
+      "loadFailed": "Falha ao carregar dados 😕",
+      "updateFailed": "Falha na atualização. Tente novamente."
+    },
+    "budget": {
+      "setGoal": "Definir Meta Mensal",
+      "currentSpent": "Gasto este mês",
+      "remaining": "Restante",
+      "percentage": "% do orçamento usado",
+      "noBudget": "Nenhuma meta definida",
+      "setBudgetPrompt": "Defina uma meta mensal para acompanhar seus gastos!"
+    },
+    "feedback": {
+      "saved": "Salvo com sucesso!",
+      "updated": "Atualizado com sucesso!",
+      "deleted": "Excluído com sucesso!",
+      "refreshed": "Dados atualizados!",
+      "error": "Algo deu errado"
+    }
+  },
+  "settings": {
+    "title": "Configurações",
+    "subtitle": "Gerencie suas preferências de conta e orçamento",
+    "budget": {
+      "title": "Orçamento Mensal",
+      "description": "Defina seu limite de gastos mensal para ajudar o Tobby a acompanhar suas despesas melhor",
+      "label": "Orçamento Mensal",
+      "placeholder": "0,00",
+      "current": "Orçamento Atual",
+      "noBudget": "Nenhum orçamento definido ainda",
+      "helpText": "Tobby usará isso para mostrar o quão bem você está se mantendo dentro do orçamento",
+      "saveButton": "Salvar Orçamento",
+      "saving": "Salvando..."
+    },
+    "account": {
+      "title": "Informações da Conta",
+      "email": "E-mail",
+      "memberSince": "Membro desde"
+    },
+    "telegram": {
+      "title": "Integração com Telegram",
+      "connected": "Conectado",
+      "notConnected": "Não conectado",
+      "linkAccount": "Vincular Conta",
+      "status": "Status",
+      "account": "Conta",
+      "unlinkButton": "Desvincular Conta",
+      "unlinkConfirm": "Tem certeza que deseja desvincular sua conta do Telegram? Você precisará vinculá-la novamente para receber notificações de recibos.",
+      "unlinkSuccess": "Conta do Telegram desvinculada com sucesso!",
+      "unlinkError": "Falha ao desvincular conta do Telegram. Tente novamente."
+    },
+    "success": "Configurações salvas com sucesso!",
+    "error": "Falha ao salvar configurações. Tente novamente."
   }
 }

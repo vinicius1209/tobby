@@ -13,8 +13,9 @@ import {
   ChevronUp,
   User2,
   LogOut,
-  Wallet,
 } from "lucide-react"
+import { TobbyLogo } from "@/components/tobby-logo"
+import { useBudget } from "@/contexts/budget-context"
 
 import {
   Sidebar,
@@ -71,10 +72,15 @@ const menuItems = [
 export function AppSidebar() {
   const pathname = usePathname()
   const t = useTranslations('navigation')
+  const tBudget = useTranslations('tobby.budget')
   const { state } = useSidebar()
   const router = useRouter()
   const supabase = getSupabaseBrowserClient()
   const [isLoggingOut, setIsLoggingOut] = useState(false)
+
+  // Get budget status from context (no DB queries)
+  const { budgetStatus } = useBudget()
+  const { variant, percentage, spent, budget } = budgetStatus
 
   const handleLogout = async () => {
     setIsLoggingOut(true)
@@ -92,16 +98,42 @@ export function AppSidebar() {
     <Sidebar>
       {/* Header */}
       <SidebarHeader className="border-b border-border px-6 py-5">
-        <Link href="/dashboard" className="flex items-center gap-2">
-          <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-primary text-primary-foreground">
-            <Wallet className="h-5 w-5" />
-          </div>
+        <Link href="/dashboard" className="flex items-center gap-3">
+          <TobbyLogo
+            size={state === "expanded" ? 48 : 40}
+            variant={variant}
+            animated={true}
+          />
           {state === "expanded" && (
-            <div className="flex flex-col">
+            <div className="flex flex-col flex-1">
               <span className="text-sm font-semibold">Tobby</span>
               <span className="text-xs text-muted-foreground">
                 {t('tagline') || 'Financial Companion'}
               </span>
+              {budget > 0 && (
+                <div className="mt-2">
+                  <div className="flex justify-between text-xs mb-1">
+                    <span className="text-muted-foreground">{tBudget('percentage')}</span>
+                    <span className={`font-semibold ${
+                      percentage > 100 ? 'text-red-600' :
+                      percentage > 80 ? 'text-yellow-600' :
+                      'text-green-600'
+                    }`}>
+                      {percentage.toFixed(0)}%
+                    </span>
+                  </div>
+                  <div className="w-full bg-muted rounded-full h-1.5 overflow-hidden">
+                    <div
+                      className={`h-full transition-all duration-500 ${
+                        percentage > 100 ? 'bg-red-500' :
+                        percentage > 80 ? 'bg-yellow-500' :
+                        'bg-green-500'
+                      }`}
+                      style={{ width: `${Math.min(percentage, 100)}%` }}
+                    />
+                  </div>
+                </div>
+              )}
             </div>
           )}
         </Link>

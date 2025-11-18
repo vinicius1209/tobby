@@ -13,6 +13,9 @@ import { ExpenseFilters, type FilterState } from "@/components/expense-filters"
 import { TelegramLinkDialog } from "@/components/telegram-link-dialog"
 import { EditExpenseDialog } from "@/components/edit-expense-dialog"
 import { DeleteExpenseDialog } from "@/components/delete-expense-dialog"
+import { TobbyPeek } from "@/components/tobby-peek"
+import { CelebrationModal } from "@/components/celebration-modal"
+import { useTobbyState } from "@/hooks/use-tobby-state"
 import type { Recibo, Category } from "@/lib/types"
 import {
   formatCurrency,
@@ -57,8 +60,12 @@ export default function DashboardPage() {
     dateTo: "",
   })
   const [isRefreshing, setIsRefreshing] = useState(false)
+  const [showCelebration, setShowCelebration] = useState(false)
   const router = useRouter()
   const supabase = getSupabaseBrowserClient()
+
+  // Get Tobby's state for floating component
+  const { variant, percentage, spent, budget } = useTobbyState(receipts)
 
   useEffect(() => {
     const fetchReceipts = async () => {
@@ -276,6 +283,9 @@ export default function DashboardPage() {
         )
         throw error
       }
+
+      // Show celebration on success
+      setShowCelebration(true)
     } catch (error) {
       console.error("Failed to update expense:", error)
       throw error
@@ -577,6 +587,21 @@ export default function DashboardPage() {
           onConfirm={handleConfirmDelete}
         />
       )}
+
+      {/* Tobby Floating Peek */}
+      <TobbyPeek
+        variant={variant}
+        budgetPercentage={percentage}
+        spent={spent}
+        budget={budget}
+      />
+
+      {/* Celebration Modal */}
+      <CelebrationModal
+        isOpen={showCelebration}
+        onClose={() => setShowCelebration(false)}
+        variant="success"
+      />
     </DashboardShell>
   )
 }

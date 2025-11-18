@@ -5,6 +5,7 @@ import { useTranslations } from "next-intl"
 import type { Recibo, Category } from "@/lib/types"
 import { getSupabaseBrowserClient } from "@/lib/supabase/client"
 import { getTransactionCategories, assignCategories } from "@/lib/category-utils"
+import { useToast } from "@/hooks/use-toast"
 import {
   Dialog,
   DialogContent,
@@ -35,6 +36,8 @@ export function EditExpenseDialog({
 }: EditExpenseDialogProps) {
   const t = useTranslations('transactions.editDialog')
   const tCat = useTranslations('transactions.categories')
+  const tTobby = useTranslations('tobby.feedback')
+  const { toast } = useToast()
   const supabase = getSupabaseBrowserClient()
   const [isSaving, setIsSaving] = useState(false)
   const [errors, setErrors] = useState<Record<string, string>>({})
@@ -105,9 +108,22 @@ export function EditExpenseDialog({
       // Then call onSave with updates AND categories
       await onSave(updates, selectedCategories)
 
+      // Show success toast
+      toast({
+        title: tTobby('updated'),
+        description: t('success'),
+      })
+
       onOpenChange(false)
     } catch (error) {
       console.error("Error saving expense:", error)
+
+      // Show error toast
+      toast({
+        title: tTobby('error'),
+        description: t('error'),
+        variant: "destructive",
+      })
     } finally {
       setIsSaving(false)
     }

@@ -416,5 +416,75 @@
         "description": "Your financial data is encrypted and protected with enterprise-grade security"
       }
     }
+  },
+  "tobby": {
+    "states": {
+      "happy": "Great job! You're on track! 🎯",
+      "neutral": "Keep it up! Staying within budget 👍",
+      "worried": "Careful! Getting close to budget limit ⚠️",
+      "overBudget": "Over budget this month 😟"
+    },
+    "celebration": {
+      "transactionSaved": "Yay! Transaction saved! 🎉",
+      "transactionEdited": "Great! All updated! ✨",
+      "transactionDeleted": "Transaction removed! 🗑️",
+      "budgetOnTrack": "You're doing amazing! 💪",
+      "firstTransaction": "Welcome! First transaction recorded! 🎊"
+    },
+    "errors": {
+      "saveFailed": "Oops! Couldn't save. Try again? 🤔",
+      "deleteFailed": "Couldn't delete. Please try again.",
+      "loadFailed": "Failed to load data 😕",
+      "updateFailed": "Update failed. Please try again."
+    },
+    "budget": {
+      "setGoal": "Set Monthly Budget",
+      "currentSpent": "Spent this month",
+      "remaining": "Remaining",
+      "percentage": "% of budget used",
+      "noBudget": "No budget set",
+      "setBudgetPrompt": "Set a monthly budget to track your spending!"
+    },
+    "feedback": {
+      "saved": "Saved successfully!",
+      "updated": "Updated successfully!",
+      "deleted": "Deleted successfully!",
+      "refreshed": "Data refreshed!",
+      "error": "Something went wrong"
+    }
+  },
+  "settings": {
+    "title": "Settings",
+    "subtitle": "Manage your account preferences and budget",
+    "budget": {
+      "title": "Monthly Budget",
+      "description": "Set your monthly spending limit to help Tobby track your expenses better",
+      "label": "Monthly Budget",
+      "placeholder": "0.00",
+      "current": "Current Budget",
+      "noBudget": "No budget set yet",
+      "helpText": "Tobby will use this to show you how well you're staying within your budget",
+      "saveButton": "Save Budget",
+      "saving": "Saving..."
+    },
+    "account": {
+      "title": "Account Information",
+      "email": "Email",
+      "memberSince": "Member since"
+    },
+    "telegram": {
+      "title": "Telegram Integration",
+      "connected": "Connected",
+      "notConnected": "Not connected",
+      "linkAccount": "Link Account",
+      "status": "Status",
+      "account": "Account",
+      "unlinkButton": "Unlink Account",
+      "unlinkConfirm": "Are you sure you want to unlink your Telegram account? You'll need to link it again to receive receipt notifications.",
+      "unlinkSuccess": "Telegram account unlinked successfully!",
+      "unlinkError": "Failed to unlink Telegram account. Please try again."
+    },
+    "success": "Settings saved successfully!",
+    "error": "Failed to save settings. Please try again."
   }
 }

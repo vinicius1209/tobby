@@ -5,6 +5,7 @@ import { NextIntlClientProvider } from 'next-intl'
 import { getMessages, getLocale } from 'next-intl/server'
 import { Toaster } from '@/components/ui/toaster'
 import { BudgetProvider } from '@/contexts/budget-context'
+import { CategoriesProvider } from '@/contexts/categories-context'
 import './globals.css'
 
 const notoSans = Noto_Sans({
@@ -66,7 +67,9 @@ export default async function RootLayout({
       <body className="font-sans antialiased">
         <NextIntlClientProvider messages={messages}>
           <BudgetProvider>
-            {children}
+            <CategoriesProvider>
+              {children}
+            </CategoriesProvider>
           </BudgetProvider>
         </NextIntlClientProvider>
         <Toaster />

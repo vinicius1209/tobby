@@ -1,9 +1,8 @@
 "use client"
 
-import { useState, useEffect } from "react"
+import { useState } from "react"
 import { useTranslations } from "next-intl"
-import { getSupabaseBrowserClient } from "@/lib/supabase/client"
-import { getUserCategories } from "@/lib/category-utils"
+import { useCategories } from "@/contexts/categories-context"
 import type { Category } from "@/lib/types"
 import { CategoryBadge } from "@/components/category-badge"
 import { Button } from "@/components/ui/button"
@@ -33,29 +32,12 @@ export function CategorySelector({
   placeholder = "Selecionar categorias"
 }: CategorySelectorProps) {
   const t = useTranslations('transactions.categories')
-  const supabase = getSupabaseBrowserClient()
+
+  // Use categories from context (cached, no query on every render)
+  const { categories: allCategories, loading } = useCategories()
 
   const [open, setOpen] = useState(false)
-  const [allCategories, setAllCategories] = useState<Category[]>([])
   const [searchTerm, setSearchTerm] = useState("")
-  const [loading, setLoading] = useState(true)
-
-  // Load all user categories
-  useEffect(() => {
-    const loadCategories = async () => {
-      const {
-        data: { user },
-      } = await supabase.auth.getUser()
-
-      if (!user) return
-
-      const categories = await getUserCategories(supabase, user.id)
-      setAllCategories(categories)
-      setLoading(false)
-    }
-
-    loadCategories()
-  }, [supabase])
 
   // Filter categories by search term
   const filteredCategories = allCategories.filter((category) =>

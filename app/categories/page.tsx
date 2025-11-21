@@ -1,13 +1,13 @@
 "use client"
 
-import { useState, useEffect } from "react"
-import { useRouter } from "next/navigation"
+import { useState } from "react"
 import { useTranslations } from "next-intl"
 import { Plus, Edit, Trash2, Tag } from "lucide-react"
 import * as Icons from "lucide-react"
 import { LucideIcon } from "lucide-react"
 import { getSupabaseBrowserClient } from "@/lib/supabase/client"
-import { getUserCategories, deleteCategory } from "@/lib/category-utils"
+import { deleteCategory } from "@/lib/category-utils"
+import { useCategories } from "@/contexts/categories-context"
 import { DashboardShell } from "@/components/dashboard-shell"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
@@ -27,33 +27,14 @@ import {
 export default function TransactionsPage() {
   const t = useTranslations('transactions.categories')
   const tCommon = useTranslations('common')
-  const router = useRouter()
   const supabase = getSupabaseBrowserClient()
 
-  const [categories, setCategories] = useState<Category[]>([])
-  const [loading, setLoading] = useState(true)
+  // Use categories from context (cached, no query on mount)
+  const { categories, loading, removeCategory, refreshCategories } = useCategories()
+
   const [dialogOpen, setDialogOpen] = useState(false)
   const [editingCategory, setEditingCategory] = useState<Category | null>(null)
   const [deletingCategory, setDeletingCategory] = useState<Category | null>(null)
-
-  useEffect(() => {
-    const fetchCategories = async () => {
-      const {
-        data: { user },
-      } = await supabase.auth.getUser()
-
-      if (!user) {
-        router.push("/login")
-        return
-      }
-
-      const userCategories = await getUserCategories(supabase, user.id)
-      setCategories(userCategories)
-      setLoading(false)
-    }
-
-    fetchCategories()
-  }, [router, supabase])
 
   const handleDelete = async () => {
     if (!deletingCategory) return
@@ -61,7 +42,8 @@ export default function TransactionsPage() {
     const success = await deleteCategory(supabase, deletingCategory.id)
 
     if (success) {
-      setCategories(prev => prev.filter(c => c.id !== deletingCategory.id))
+      // Optimistic update via context
+      removeCategory(deletingCategory.id)
     } else {
       console.error("Failed to delete category")
     }
@@ -70,15 +52,8 @@ export default function TransactionsPage() {
   }
 
   const handleDialogSuccess = async () => {
-    // Refresh categories list
-    const {
-      data: { user },
-    } = await supabase.auth.getUser()
-
-    if (!user) return
-
-    const userCategories = await getUserCategories(supabase, user.id)
-    setCategories(userCategories)
+    // Refresh categories list from database
+    await refreshCategories()
 
     // Reset editing state
     setEditingCategory(null)

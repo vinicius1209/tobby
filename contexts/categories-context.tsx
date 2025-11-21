@@ -10,6 +10,7 @@ import {
 } from "react"
 import { getSupabaseBrowserClient } from "@/lib/supabase/client"
 import { getUserCategories } from "@/lib/category-utils"
+import { useAuth } from "./auth-context"
 import type { Category } from "@/lib/types"
 
 interface CategoriesContextType {
@@ -29,6 +30,7 @@ const CACHE_TTL = 30 * 60 * 1000
 
 export function CategoriesProvider({ children }: { children: ReactNode }) {
   const supabase = getSupabaseBrowserClient()
+  const { user } = useAuth()
 
   const [categories, setCategories] = useState<Category[]>([])
   const [loading, setLoading] = useState(true)
@@ -43,21 +45,17 @@ export function CategoriesProvider({ children }: { children: ReactNode }) {
       return
     }
 
+    if (!user) {
+      setCategories([])
+      setLoading(false)
+      return
+    }
+
     try {
       setLoading(true)
       setError(null)
 
-      const {
-        data: { user },
-      } = await supabase.auth.getUser()
-
-      if (!user) {
-        setCategories([])
-        setLoading(false)
-        return
-      }
-
-      // Fetch categories (single query)
+      // Fetch categories (single query, no auth query needed)
       const userCategories = await getUserCategories(supabase, user.id)
 
       setCategories(userCategories)
@@ -68,7 +66,7 @@ export function CategoriesProvider({ children }: { children: ReactNode }) {
     } finally {
       setLoading(false)
     }
-  }, [supabase, lastFetchTime])
+  }, [supabase, user, lastFetchTime])
 
   // Initial fetch on mount
   useEffect(() => {

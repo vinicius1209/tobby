@@ -3,6 +3,7 @@
 import { createContext, useContext, useState, useEffect, useCallback, ReactNode } from "react"
 import { getSupabaseBrowserClient } from "@/lib/supabase/client"
 import { getUserBudget, calculateBudgetStatus, type BudgetStatus } from "@/lib/budget-utils"
+import { useAuth } from "./auth-context"
 
 interface BudgetContextType {
   budgetStatus: BudgetStatus
@@ -17,6 +18,7 @@ const CACHE_TTL = 5 * 60 * 1000 // 5 minutes
 
 export function BudgetProvider({ children }: { children: ReactNode }) {
   const supabase = getSupabaseBrowserClient()
+  const { user } = useAuth()
 
   const [budgetStatus, setBudgetStatus] = useState<BudgetStatus>({
     budget: 0,
@@ -38,19 +40,15 @@ export function BudgetProvider({ children }: { children: ReactNode }) {
       return
     }
 
+    if (!user) {
+      setLoading(false)
+      return
+    }
+
     try {
       setLoading(true)
 
-      const {
-        data: { user },
-      } = await supabase.auth.getUser()
-
-      if (!user) {
-        setLoading(false)
-        return
-      }
-
-      // Fetch budget (single query)
+      // Fetch budget (single query, no auth query needed)
       const budget = await getUserBudget(supabase, user.id)
 
       // Initialize with 0 spent (will be updated via updateMonthlySpent)
@@ -63,7 +61,7 @@ export function BudgetProvider({ children }: { children: ReactNode }) {
     } finally {
       setLoading(false)
     }
-  }, [supabase, lastFetchTime])
+  }, [supabase, user, lastFetchTime])
 
   // Initial fetch on mount
   useEffect(() => {

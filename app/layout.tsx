@@ -4,8 +4,11 @@ import { Analytics } from '@vercel/analytics/next'
 import { NextIntlClientProvider } from 'next-intl'
 import { getMessages, getLocale } from 'next-intl/server'
 import { Toaster } from '@/components/ui/toaster'
+import { AuthProvider } from '@/contexts/auth-context'
+import { UserProvider } from '@/contexts/user-context'
 import { BudgetProvider } from '@/contexts/budget-context'
 import { CategoriesProvider } from '@/contexts/categories-context'
+import { TelegramProvider } from '@/contexts/telegram-context'
 import './globals.css'
 
 const notoSans = Noto_Sans({
@@ -66,11 +69,17 @@ export default async function RootLayout({
     <html lang={locale} className={notoSans.variable} suppressHydrationWarning>
       <body className="font-sans antialiased">
         <NextIntlClientProvider messages={messages}>
-          <BudgetProvider>
-            <CategoriesProvider>
-              {children}
-            </CategoriesProvider>
-          </BudgetProvider>
+          <AuthProvider>
+            <UserProvider>
+              <BudgetProvider>
+                <CategoriesProvider>
+                  <TelegramProvider>
+                    {children}
+                  </TelegramProvider>
+                </CategoriesProvider>
+              </BudgetProvider>
+            </UserProvider>
+          </AuthProvider>
         </NextIntlClientProvider>
         <Toaster />
         <Analytics />

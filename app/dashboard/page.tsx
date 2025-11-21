@@ -6,15 +6,19 @@ import { useTranslations } from "next-intl"
 import { getSupabaseBrowserClient } from "@/lib/supabase/client"
 import { DashboardShell } from "@/components/dashboard-shell"
 import { ExpenseCardAdvanced } from "@/components/expense-card-advanced"
+import { ExpenseCardMobile } from "@/components/expense-card-mobile"
 import { ExpenseListHeader } from "@/components/expense-list-header"
 import { ExpensesTimeline } from "@/components/expenses-timeline"
 import { StatsCard } from "@/components/stats-card"
+import { BudgetBalanceCard } from "@/components/budget-balance-card"
+import { QuickActionsGrid } from "@/components/quick-actions-grid"
 import { ExpenseFilters, type FilterState } from "@/components/expense-filters"
 import { TelegramLinkDialog } from "@/components/telegram-link-dialog"
 import { EditExpenseDialog } from "@/components/edit-expense-dialog"
 import { DeleteExpenseDialog } from "@/components/delete-expense-dialog"
 import { TobbyPeek } from "@/components/tobby-peek"
 import { useTobbyState } from "@/hooks/use-tobby-state"
+import { useMediaQuery } from "@/hooks/use-media-query"
 import type { Recibo, Category } from "@/lib/types"
 import {
   formatCurrency,
@@ -66,6 +70,9 @@ export default function DashboardPage() {
 
   // Get Tobby's state for floating component
   const { variant, percentage, spent, budget } = useTobbyState(receipts)
+
+  // Detect mobile breakpoint
+  const isMobile = useMediaQuery("(max-width: 768px)")
 
   useEffect(() => {
     const fetchReceipts = async () => {
@@ -386,41 +393,30 @@ export default function DashboardPage() {
 
   return (
     <DashboardShell breadcrumb={[{ label: t('title') }]}>
-      <div className="flex-1 space-y-4 p-8 pt-6">
-        <div className="space-y-8">
-          {/* Header */}
-          <div>
-            <h2 className="text-3xl font-bold">{t('title')}</h2>
-            <p className="text-muted-foreground mt-1">{t('subtitle')}</p>
-          </div>
+      {isMobile ? (
+        /* MOBILE LAYOUT */
+        <div className="flex-1 space-y-6 p-4 pt-4">
+          {/* Budget Balance Card */}
+          <BudgetBalanceCard
+            budget={budget}
+            spent={spent}
+            remaining={budget - spent}
+            percentage={percentage}
+            variant={variant}
+          />
 
-          {/* Stats Grid */}
-          <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
-            <StatsCard
-              title={t('stats.totalSpent')}
-              value={formatCurrency(totalSpent)}
-              description={t('stats.filteredResults')}
-              icon={TrendingUp}
-            />
-            <StatsCard
-              title={t('stats.thisMonth')}
-              value={formatCurrency(monthlySpent)}
-              description={`${monthlyReceipts.length} ${t('stats.transactions')}`}
-              icon={Calendar}
-            />
-            <StatsCard
-              title={t('stats.totalTransactions')}
-              value={totalReceipts.toString()}
-              description={t('stats.filteredResults')}
-              icon={Receipt}
-            />
-            <StatsCard
-              title={t('stats.avgTransaction')}
-              value={formatCurrency(avgSpent)}
-              description={t('stats.perTransaction')}
-              icon={CreditCard}
-            />
-          </div>
+          {/* Quick Actions Grid */}
+          <QuickActionsGrid
+            onRecurringIncomeClick={() => router.push('/recurring-income')}
+            onMonthlySummaryClick={() => {
+              // TODO: Open monthly summary modal/sheet
+              console.log("Monthly summary clicked")
+            }}
+            onFiltersClick={() => {
+              // Trigger filter sheet open
+              document.querySelector('[data-filter-trigger]')?.dispatchEvent(new Event('click'))
+            }}
+          />
 
           {/* Telegram Integration Info */}
           {!isLinked && (
@@ -448,112 +444,250 @@ export default function DashboardPage() {
             </Alert>
           )}
 
-          {/* Recent Expenses with Tabs */}
+          {/* Recent Expenses - Mobile */}
           <div className="space-y-4">
-            {filteredReceipts.length > 0 ? (
-              <Tabs defaultValue="cards" className="w-full">
-                {/* Header with title, tabs, and filter button */}
-                <div className="flex items-center justify-between mb-4">
-                  <h3 className="text-xl font-semibold">
-                    {t('recentExpenses')}{" "}
-                    {filteredReceipts.length !== receipts.length && (
-                      <span className="text-muted-foreground text-sm font-normal">
-                        ({filteredReceipts.length} {tCommon('of')} {receipts.length})
-                      </span>
-                    )}
-                  </h3>
-                  <div className="flex items-center gap-3">
-                    <TabsList className="grid w-64 grid-cols-2">
-                      <TabsTrigger value="cards">{tViewModes('cards')}</TabsTrigger>
-                      <TabsTrigger value="timeline">{tViewModes('timeline')}</TabsTrigger>
-                    </TabsList>
-                    <Button
-                      variant="outline"
-                      size="icon"
-                      onClick={handleRefreshReceipts}
-                      disabled={isRefreshing}
-                    >
-                      <RefreshCw className={`h-4 w-4 ${isRefreshing ? 'animate-spin' : ''}`} />
+            {/* Header with filter button */}
+            <div className="flex items-center justify-between">
+              <h3 className="text-xl font-semibold">
+                {t('recentExpenses')}{" "}
+                {filteredReceipts.length !== receipts.length && (
+                  <span className="text-muted-foreground text-sm font-normal">
+                    ({filteredReceipts.length})
+                  </span>
+                )}
+              </h3>
+              <div className="flex items-center gap-2">
+                <Button
+                  variant="outline"
+                  size="icon"
+                  onClick={handleRefreshReceipts}
+                  disabled={isRefreshing}
+                >
+                  <RefreshCw className={`h-4 w-4 ${isRefreshing ? 'animate-spin' : ''}`} />
+                </Button>
+                <Sheet>
+                  <SheetTrigger asChild>
+                    <Button variant="outline" size="icon" data-filter-trigger>
+                      <Filter className="h-4 w-4" />
                     </Button>
-                    <Sheet>
-                      <SheetTrigger asChild>
-                        <Button variant="outline" size="icon">
-                          <Filter className="h-4 w-4" />
-                        </Button>
-                      </SheetTrigger>
-                      <SheetContent side="right" className="w-full sm:max-w-md p-0">
-                        <SheetHeader className="px-4 pt-6 pb-4 border-b">
-                          <SheetTitle>{tCommon('filters')}</SheetTitle>
-                        </SheetHeader>
-                        <ExpenseFilters
-                          onFilterChange={handleFilterChange}
-                          establishmentTypes={establishmentTypes}
-                        />
-                      </SheetContent>
-                    </Sheet>
-                  </div>
-                </div>
+                  </SheetTrigger>
+                  <SheetContent side="bottom" className="h-[80vh] p-0">
+                    <SheetHeader className="px-4 pt-6 pb-4 border-b">
+                      <SheetTitle>{tCommon('filters')}</SheetTitle>
+                    </SheetHeader>
+                    <ExpenseFilters
+                      onFilterChange={handleFilterChange}
+                      establishmentTypes={establishmentTypes}
+                    />
+                  </SheetContent>
+                </Sheet>
+              </div>
+            </div>
 
-                {/* Card container with rounded corners */}
-                <Card className="rounded-2xl border-2 overflow-hidden">
-                  <TabsContent value="cards" className="m-0">
-                    <ScrollArea className="h-[600px]">
-                      <ExpenseListHeader
-                        sortBy={sortBy}
-                        sortOrder={sortOrder}
-                        onSort={handleSort}
-                      />
-                      <div>
-                        {sortedReceipts.map((recibo, index) => {
-                          const monthPercentage = calculateMonthPercentage(recibo, currentMonthTotal)
-                          const frequency = calculateFrequency(recibo, filteredReceipts)
-                          const trend = calculateCategoryTrend(recibo, filteredReceipts)
+            {/* Transaction List */}
+            {filteredReceipts.length > 0 ? (
+              <div className="space-y-3">
+                {sortedReceipts.map((recibo) => {
+                  const monthPercentage = calculateMonthPercentage(recibo, currentMonthTotal)
+                  const frequency = calculateFrequency(recibo, filteredReceipts)
 
-                          return (
-                            <ExpenseCardAdvanced
-                              key={recibo.id}
-                              recibo={recibo}
-                              categories={recibo.categories || []}
-                              monthPercentage={monthPercentage}
-                              frequency={frequency}
-                              trend={trend}
-                              index={index}
-                              onEdit={handleEditRecibo}
-                              onDelete={handleDeleteRecibo}
-                            />
-                          )
-                        })}
-                      </div>
-                    </ScrollArea>
-                  </TabsContent>
-
-                  <TabsContent value="timeline" className="m-0 p-6">
-                    <ScrollArea className="h-[600px] pr-4">
-                      <ExpensesTimeline receipts={sortedReceipts} />
-                    </ScrollArea>
-                  </TabsContent>
-                </Card>
-              </Tabs>
+                  return (
+                    <ExpenseCardMobile
+                      key={recibo.id}
+                      recibo={recibo}
+                      categories={recibo.categories || []}
+                      monthPercentage={monthPercentage}
+                      frequency={frequency}
+                      onEdit={handleEditRecibo}
+                      onDelete={handleDeleteRecibo}
+                    />
+                  )
+                })}
+              </div>
             ) : receipts.length > 0 ? (
-              <>
-                <h3 className="text-xl font-semibold">{t('recentExpenses')}</h3>
-                <Card className="p-8 text-center rounded-2xl">
-                  <InfoIcon className="h-12 w-12 mx-auto text-muted-foreground mb-4" />
-                  <p className="text-muted-foreground">{t('noTransactionsMatchFilters')}</p>
-                </Card>
-              </>
+              <Card className="p-8 text-center rounded-2xl">
+                <InfoIcon className="h-12 w-12 mx-auto text-muted-foreground mb-4" />
+                <p className="text-muted-foreground">{t('noTransactionsMatchFilters')}</p>
+              </Card>
             ) : (
-              <>
-                <h3 className="text-xl font-semibold">{t('recentExpenses')}</h3>
-                <Card className="p-8 text-center rounded-2xl">
-                  <Receipt className="h-12 w-12 mx-auto text-muted-foreground mb-4" />
-                  <p className="text-muted-foreground">{t('noTransactionsToDisplay')}</p>
-                </Card>
-              </>
+              <Card className="p-8 text-center rounded-2xl">
+                <Receipt className="h-12 w-12 mx-auto text-muted-foreground mb-4" />
+                <p className="text-muted-foreground">{t('noTransactionsToDisplay')}</p>
+              </Card>
             )}
           </div>
         </div>
-      </div>
+      ) : (
+        /* DESKTOP LAYOUT */
+        <div className="flex-1 space-y-4 p-8 pt-6">
+          <div className="space-y-8">
+            {/* Header */}
+            <div>
+              <h2 className="text-3xl font-bold">{t('title')}</h2>
+              <p className="text-muted-foreground mt-1">{t('subtitle')}</p>
+            </div>
+
+            {/* Stats Grid */}
+            <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
+              <StatsCard
+                title={t('stats.totalSpent')}
+                value={formatCurrency(totalSpent)}
+                description={t('stats.filteredResults')}
+                icon={TrendingUp}
+              />
+              <StatsCard
+                title={t('stats.thisMonth')}
+                value={formatCurrency(monthlySpent)}
+                description={`${monthlyReceipts.length} ${t('stats.transactions')}`}
+                icon={Calendar}
+              />
+              <StatsCard
+                title={t('stats.totalTransactions')}
+                value={totalReceipts.toString()}
+                description={t('stats.filteredResults')}
+                icon={Receipt}
+              />
+              <StatsCard
+                title={t('stats.avgTransaction')}
+                value={formatCurrency(avgSpent)}
+                description={t('stats.perTransaction')}
+                icon={CreditCard}
+              />
+            </div>
+
+            {/* Telegram Integration Info */}
+            {!isLinked && (
+              <Alert>
+                <Link2 className="h-4 w-4" />
+                <AlertTitle>{t('telegram.connectTitle')}</AlertTitle>
+                <AlertDescription className="mt-2">
+                  <p className="mb-3">
+                    {t('telegram.connectDescription')}
+                  </p>
+                  <Button onClick={() => setShowLinkDialog(true)} size="sm">
+                    <Link2 className="mr-2 h-4 w-4" />
+                    {t('telegram.linkAccount')}
+                  </Button>
+                </AlertDescription>
+              </Alert>
+            )}
+
+            {isLinked && receipts.length === 0 && (
+              <Alert>
+                <InfoIcon className="h-4 w-4" />
+                <AlertDescription>
+                  {t('telegram.noExpenses')}
+                </AlertDescription>
+              </Alert>
+            )}
+
+            {/* Recent Expenses with Tabs */}
+            <div className="space-y-4">
+              {filteredReceipts.length > 0 ? (
+                <Tabs defaultValue="cards" className="w-full">
+                  {/* Header with title, tabs, and filter button */}
+                  <div className="flex items-center justify-between mb-4">
+                    <h3 className="text-xl font-semibold">
+                      {t('recentExpenses')}{" "}
+                      {filteredReceipts.length !== receipts.length && (
+                        <span className="text-muted-foreground text-sm font-normal">
+                          ({filteredReceipts.length} {tCommon('of')} {receipts.length})
+                        </span>
+                      )}
+                    </h3>
+                    <div className="flex items-center gap-3">
+                      <TabsList className="grid w-64 grid-cols-2">
+                        <TabsTrigger value="cards">{tViewModes('cards')}</TabsTrigger>
+                        <TabsTrigger value="timeline">{tViewModes('timeline')}</TabsTrigger>
+                      </TabsList>
+                      <Button
+                        variant="outline"
+                        size="icon"
+                        onClick={handleRefreshReceipts}
+                        disabled={isRefreshing}
+                      >
+                        <RefreshCw className={`h-4 w-4 ${isRefreshing ? 'animate-spin' : ''}`} />
+                      </Button>
+                      <Sheet>
+                        <SheetTrigger asChild>
+                          <Button variant="outline" size="icon">
+                            <Filter className="h-4 w-4" />
+                          </Button>
+                        </SheetTrigger>
+                        <SheetContent side="right" className="w-full sm:max-w-md p-0">
+                          <SheetHeader className="px-4 pt-6 pb-4 border-b">
+                            <SheetTitle>{tCommon('filters')}</SheetTitle>
+                          </SheetHeader>
+                          <ExpenseFilters
+                            onFilterChange={handleFilterChange}
+                            establishmentTypes={establishmentTypes}
+                          />
+                        </SheetContent>
+                      </Sheet>
+                    </div>
+                  </div>
+
+                  {/* Card container with rounded corners */}
+                  <Card className="rounded-2xl border-2 overflow-hidden">
+                    <TabsContent value="cards" className="m-0">
+                      <ScrollArea className="h-[600px]">
+                        <ExpenseListHeader
+                          sortBy={sortBy}
+                          sortOrder={sortOrder}
+                          onSort={handleSort}
+                        />
+                        <div>
+                          {sortedReceipts.map((recibo, index) => {
+                            const monthPercentage = calculateMonthPercentage(recibo, currentMonthTotal)
+                            const frequency = calculateFrequency(recibo, filteredReceipts)
+                            const trend = calculateCategoryTrend(recibo, filteredReceipts)
+
+                            return (
+                              <ExpenseCardAdvanced
+                                key={recibo.id}
+                                recibo={recibo}
+                                categories={recibo.categories || []}
+                                monthPercentage={monthPercentage}
+                                frequency={frequency}
+                                trend={trend}
+                                index={index}
+                                onEdit={handleEditRecibo}
+                                onDelete={handleDeleteRecibo}
+                              />
+                            )
+                          })}
+                        </div>
+                      </ScrollArea>
+                    </TabsContent>
+
+                    <TabsContent value="timeline" className="m-0 p-6">
+                      <ScrollArea className="h-[600px] pr-4">
+                        <ExpensesTimeline receipts={sortedReceipts} />
+                      </ScrollArea>
+                    </TabsContent>
+                  </Card>
+                </Tabs>
+              ) : receipts.length > 0 ? (
+                <>
+                  <h3 className="text-xl font-semibold">{t('recentExpenses')}</h3>
+                  <Card className="p-8 text-center rounded-2xl">
+                    <InfoIcon className="h-12 w-12 mx-auto text-muted-foreground mb-4" />
+                    <p className="text-muted-foreground">{t('noTransactionsMatchFilters')}</p>
+                  </Card>
+                </>
+              ) : (
+                <>
+                  <h3 className="text-xl font-semibold">{t('recentExpenses')}</h3>
+                  <Card className="p-8 text-center rounded-2xl">
+                    <Receipt className="h-12 w-12 mx-auto text-muted-foreground mb-4" />
+                    <p className="text-muted-foreground">{t('noTransactionsToDisplay')}</p>
+                  </Card>
+                </>
+              )}
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* Telegram Link Dialog */}
       <TelegramLinkDialog
@@ -585,13 +719,15 @@ export default function DashboardPage() {
         />
       )}
 
-      {/* Tobby Floating Peek */}
-      <TobbyPeek
-        variant={variant}
-        budgetPercentage={percentage}
-        spent={spent}
-        budget={budget}
-      />
+      {/* Tobby Floating Peek - Desktop Only */}
+      {!isMobile && (
+        <TobbyPeek
+          variant={variant}
+          budgetPercentage={percentage}
+          spent={spent}
+          budget={budget}
+        />
+      )}
     </DashboardShell>
   )
 }

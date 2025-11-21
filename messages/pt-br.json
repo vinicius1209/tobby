@@ -89,6 +89,16 @@
     "recentExpenses": "Transações Recentes",
     "noTransactionsMatchFilters": "Nenhuma transação corresponde aos seus filtros",
     "noTransactionsToDisplay": "Nenhuma transação para exibir",
+    "balance": {
+      "available": "Saldo Disponível",
+      "monthlySpent": "Gasto Mensal",
+      "of": "de"
+    },
+    "quickActions": {
+      "recurring": "Recorrente",
+      "summary": "Resumo",
+      "filters": "Filtros"
+    },
     "stats": {
       "totalSpent": "Total Gasto",
       "thisMonth": "Este Mês",
@@ -203,7 +213,9 @@
   },
   "transactions": {
     "card": {
-      "vsPreviousMonth": "vs mês ant."
+      "vsPreviousMonth": "vs mês ant.",
+      "ofMonth": "do mês",
+      "thisMonth": "este mês"
     },
     "timeline": {
       "title": "Timeline de Transações",
@@ -423,6 +435,11 @@
       "neutral": "Continue assim! Dentro do orçamento 👍",
       "worried": "Cuidado! Chegando perto do limite 💡",
       "overBudget": "Acima do orçamento este mês 😟"
+    },
+    "messages": {
+      "keepGoing": "Você está indo muito bem! Continue assim!",
+      "payAttention": "Atenção aos gastos, você está chegando perto!",
+      "beCareful": "Cuidado! Você excedeu seu orçamento!"
     },
     "celebration": {
       "transactionSaved": "Eba! Transação salva! 🎉",

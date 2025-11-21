@@ -89,6 +89,16 @@
     "recentExpenses": "Recent Transactions",
     "noTransactionsMatchFilters": "No transactions match your filters",
     "noTransactionsToDisplay": "No transactions to display",
+    "balance": {
+      "available": "Available Balance",
+      "monthlySpent": "Monthly Spent",
+      "of": "of"
+    },
+    "quickActions": {
+      "recurring": "Recurring",
+      "summary": "Summary",
+      "filters": "Filters"
+    },
     "stats": {
       "totalSpent": "Total Spent",
       "thisMonth": "This Month",
@@ -203,7 +213,9 @@
   },
   "transactions": {
     "card": {
-      "vsPreviousMonth": "vs prev. mo."
+      "vsPreviousMonth": "vs prev. mo.",
+      "ofMonth": "of month",
+      "thisMonth": "this month"
     },
     "timeline": {
       "title": "Transactions Timeline",
@@ -423,6 +435,11 @@
       "neutral": "Keep it up! Staying within budget 👍",
       "worried": "Careful! Getting close to budget limit ⚠️",
       "overBudget": "Over budget this month 😟"
+    },
+    "messages": {
+      "keepGoing": "You're doing great! Keep it up!",
+      "payAttention": "Watch your spending, you're getting close!",
+      "beCareful": "Be careful! You've exceeded your budget!"
     },
     "celebration": {
       "transactionSaved": "Yay! Transaction saved! 🎉",

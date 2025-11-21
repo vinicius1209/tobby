@@ -60,7 +60,7 @@ export function BudgetBalanceCard({
     >
       <Card
         className={cn(
-          "border-2 overflow-hidden",
+          "border-2 overflow-hidden rounded-xl",
           "bg-gradient-to-br",
           config.bgGradient
         )}

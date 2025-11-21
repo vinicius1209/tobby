@@ -95,9 +95,32 @@
       "of": "de"
     },
     "quickActions": {
-      "recurring": "Recorrente",
-      "summary": "Resumo",
-      "filters": "Filtros"
+      "addExpense": "Adicionar Despesa",
+      "addIncome": "Adicionar Entrada",
+      "summary": "Resumo"
+    },
+    "addTransaction": {
+      "addExpense": "Adicionar Despesa",
+      "addIncome": "Adicionar Entrada",
+      "addExpenseDescription": "Registre uma nova transação de despesa",
+      "addIncomeDescription": "Registre um novo depósito de entrada",
+      "description": "Descrição",
+      "descriptionPlaceholder": "ex: Compras no mercado",
+      "amount": "Valor",
+      "date": "Data"
+    },
+    "monthlySummary": {
+      "title": "Resumo Mensal",
+      "description": "Sua visão geral financeira deste mês",
+      "expenses": "Despesas",
+      "income": "Entradas",
+      "transactions": "transações",
+      "avgPerDay": "Média por Dia",
+      "biggestExpense": "Maior Despesa",
+      "basedOn": "Baseado em",
+      "days": "dias",
+      "noExpenses": "Nenhuma despesa ainda",
+      "topCategories": "Top 5 Categorias"
     },
     "stats": {
       "totalSpent": "Total Gasto",

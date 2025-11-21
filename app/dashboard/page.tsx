@@ -16,6 +16,8 @@ import { ExpenseFilters, type FilterState } from "@/components/expense-filters"
 import { TelegramLinkDialog } from "@/components/telegram-link-dialog"
 import { EditExpenseDialog } from "@/components/edit-expense-dialog"
 import { DeleteExpenseDialog } from "@/components/delete-expense-dialog"
+import { AddTransactionDialog } from "@/components/add-transaction-dialog"
+import { MonthlySummarySheet } from "@/components/monthly-summary-sheet"
 import { TobbyPeek } from "@/components/tobby-peek"
 import { useTobbyState } from "@/hooks/use-tobby-state"
 import { useMediaQuery } from "@/hooks/use-media-query"
@@ -30,7 +32,7 @@ import {
   getMonthTotal,
   parseDateString,
 } from "@/lib/format-utils"
-import { Receipt, TrendingUp, Calendar, CreditCard, Link2, Filter, RefreshCw } from "lucide-react"
+import { Receipt, TrendingUp, Calendar, CreditCard, Link2, Filter, RefreshCw, LayoutList } from "lucide-react"
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert"
 import { InfoIcon } from "lucide-react"
 import { Button } from "@/components/ui/button"
@@ -65,6 +67,10 @@ export default function DashboardPage() {
     dateTo: "",
   })
   const [isRefreshing, setIsRefreshing] = useState(false)
+  const [showAddExpense, setShowAddExpense] = useState(false)
+  const [showAddIncome, setShowAddIncome] = useState(false)
+  const [showMonthlySummary, setShowMonthlySummary] = useState(false)
+  const [viewMode, setViewMode] = useState<"cards" | "timeline">("cards")
   const router = useRouter()
   const supabase = getSupabaseBrowserClient()
 
@@ -407,15 +413,9 @@ export default function DashboardPage() {
 
           {/* Quick Actions Grid */}
           <QuickActionsGrid
-            onRecurringIncomeClick={() => router.push('/recurring-income')}
-            onMonthlySummaryClick={() => {
-              // TODO: Open monthly summary modal/sheet
-              console.log("Monthly summary clicked")
-            }}
-            onFiltersClick={() => {
-              // Trigger filter sheet open
-              document.querySelector('[data-filter-trigger]')?.dispatchEvent(new Event('click'))
-            }}
+            onAddExpenseClick={() => setShowAddExpense(true)}
+            onAddIncomeClick={() => setShowAddIncome(true)}
+            onMonthlySummaryClick={() => setShowMonthlySummary(true)}
           />
 
           {/* Telegram Integration Info */}
@@ -460,6 +460,14 @@ export default function DashboardPage() {
                 <Button
                   variant="outline"
                   size="icon"
+                  onClick={() => setViewMode(viewMode === "cards" ? "timeline" : "cards")}
+                  title={viewMode === "cards" ? tViewModes("timeline") : tViewModes("cards")}
+                >
+                  <LayoutList className="h-4 w-4" />
+                </Button>
+                <Button
+                  variant="outline"
+                  size="icon"
                   onClick={handleRefreshReceipts}
                   disabled={isRefreshing}
                 >
@@ -486,24 +494,28 @@ export default function DashboardPage() {
 
             {/* Transaction List */}
             {filteredReceipts.length > 0 ? (
-              <div className="space-y-3">
-                {sortedReceipts.map((recibo) => {
-                  const monthPercentage = calculateMonthPercentage(recibo, currentMonthTotal)
-                  const frequency = calculateFrequency(recibo, filteredReceipts)
+              viewMode === "cards" ? (
+                <div className="space-y-3">
+                  {sortedReceipts.map((recibo) => {
+                    const monthPercentage = calculateMonthPercentage(recibo, currentMonthTotal)
+                    const frequency = calculateFrequency(recibo, filteredReceipts)
 
-                  return (
-                    <ExpenseCardMobile
-                      key={recibo.id}
-                      recibo={recibo}
-                      categories={recibo.categories || []}
-                      monthPercentage={monthPercentage}
-                      frequency={frequency}
-                      onEdit={handleEditRecibo}
-                      onDelete={handleDeleteRecibo}
-                    />
-                  )
-                })}
-              </div>
+                    return (
+                      <ExpenseCardMobile
+                        key={recibo.id}
+                        recibo={recibo}
+                        categories={recibo.categories || []}
+                        monthPercentage={monthPercentage}
+                        frequency={frequency}
+                        onEdit={handleEditRecibo}
+                        onDelete={handleDeleteRecibo}
+                      />
+                    )
+                  })}
+                </div>
+              ) : (
+                <ExpensesTimeline receipts={sortedReceipts} />
+              )
             ) : receipts.length > 0 ? (
               <Card className="p-8 text-center rounded-2xl">
                 <InfoIcon className="h-12 w-12 mx-auto text-muted-foreground mb-4" />
@@ -718,6 +730,29 @@ export default function DashboardPage() {
           onConfirm={handleConfirmDelete}
         />
       )}
+
+      {/* Add Transaction Dialogs */}
+      <AddTransactionDialog
+        open={showAddExpense}
+        onOpenChange={setShowAddExpense}
+        transactionType="withdrawal"
+        onSuccess={handleRefreshReceipts}
+      />
+
+      <AddTransactionDialog
+        open={showAddIncome}
+        onOpenChange={setShowAddIncome}
+        transactionType="deposit"
+        onSuccess={handleRefreshReceipts}
+      />
+
+      {/* Monthly Summary Sheet */}
+      <MonthlySummarySheet
+        open={showMonthlySummary}
+        onOpenChange={setShowMonthlySummary}
+        transactions={receipts}
+        budget={budget}
+      />
 
       {/* Tobby Floating Peek - Desktop Only */}
       {!isMobile && (

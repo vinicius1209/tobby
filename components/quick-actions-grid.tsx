@@ -2,47 +2,50 @@
 
 import { motion } from "framer-motion"
 import { Card } from "@/components/ui/card"
-import { RefreshCw, BarChart3, Filter } from "lucide-react"
+import { TrendingDown, TrendingUp, BarChart3 } from "lucide-react"
 import { useTranslations } from "next-intl"
 import { cn } from "@/lib/utils"
 
 interface QuickActionsGridProps {
-  onRecurringIncomeClick: () => void
+  onAddExpenseClick: () => void
+  onAddIncomeClick: () => void
   onMonthlySummaryClick: () => void
-  onFiltersClick: () => void
   className?: string
 }
 
 const actions = [
   {
-    key: "recurring",
-    icon: RefreshCw,
-    labelKey: "recurring",
+    key: "addExpense",
+    icon: TrendingDown,
+    labelKey: "addExpense",
+    colorClass: "text-red-600",
+  },
+  {
+    key: "addIncome",
+    icon: TrendingUp,
+    labelKey: "addIncome",
+    colorClass: "text-green-600",
   },
   {
     key: "summary",
     icon: BarChart3,
     labelKey: "summary",
-  },
-  {
-    key: "filters",
-    icon: Filter,
-    labelKey: "filters",
+    colorClass: "text-primary",
   },
 ] as const
 
 export function QuickActionsGrid({
-  onRecurringIncomeClick,
+  onAddExpenseClick,
+  onAddIncomeClick,
   onMonthlySummaryClick,
-  onFiltersClick,
   className,
 }: QuickActionsGridProps) {
   const t = useTranslations("dashboard.quickActions")
 
   const handlers = {
-    recurring: onRecurringIncomeClick,
+    addExpense: onAddExpenseClick,
+    addIncome: onAddIncomeClick,
     summary: onMonthlySummaryClick,
-    filters: onFiltersClick,
   }
 
   return (
@@ -60,7 +63,7 @@ export function QuickActionsGrid({
           >
             <Card
               className={cn(
-                "h-24 p-0 overflow-hidden cursor-pointer border-2",
+                "h-24 p-0 overflow-hidden cursor-pointer border-2 rounded-xl",
                 "hover:shadow-lg hover:border-primary/50 transition-all",
                 "active:scale-95"
               )}
@@ -70,7 +73,7 @@ export function QuickActionsGrid({
                 className="w-full h-full flex flex-col items-center justify-center gap-2 p-3 text-center focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 rounded-lg"
                 aria-label={t(action.labelKey)}
               >
-                <Icon className="h-6 w-6 text-primary flex-shrink-0" />
+                <Icon className={cn("h-6 w-6 flex-shrink-0", action.colorClass)} />
                 <span className="text-xs font-medium leading-tight">
                   {t(action.labelKey)}
                 </span>

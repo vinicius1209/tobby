@@ -54,7 +54,7 @@ export function ExpenseCardMobile({
       transition={{ duration: 0.2 }}
       whileTap={{ scale: 0.98 }}
     >
-      <Card className="hover:shadow-md transition-shadow">
+      <Card className="hover:shadow-md transition-shadow rounded-xl">
         <CardContent className="p-4">
           {/* Row 1: Icon + Description + Value */}
           <div className="flex items-start gap-3 mb-2">

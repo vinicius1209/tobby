@@ -95,9 +95,32 @@
       "of": "of"
     },
     "quickActions": {
-      "recurring": "Recurring",
-      "summary": "Summary",
-      "filters": "Filters"
+      "addExpense": "Add Expense",
+      "addIncome": "Add Income",
+      "summary": "Summary"
+    },
+    "addTransaction": {
+      "addExpense": "Add Expense",
+      "addIncome": "Add Income",
+      "addExpenseDescription": "Record a new expense transaction",
+      "addIncomeDescription": "Record a new income deposit",
+      "description": "Description",
+      "descriptionPlaceholder": "e.g., Grocery shopping",
+      "amount": "Amount",
+      "date": "Date"
+    },
+    "monthlySummary": {
+      "title": "Monthly Summary",
+      "description": "Your financial overview for this month",
+      "expenses": "Expenses",
+      "income": "Income",
+      "transactions": "transactions",
+      "avgPerDay": "Avg. per Day",
+      "biggestExpense": "Biggest Expense",
+      "basedOn": "Based on",
+      "days": "days",
+      "noExpenses": "No expenses yet",
+      "topCategories": "Top 5 Categories"
     },
     "stats": {
       "totalSpent": "Total Spent",

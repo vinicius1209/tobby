@@ -27,6 +27,15 @@ export function formatCurrency(value: number): string {
 }
 
 /**
+ * Parse YYYY-MM-DD string to Date object in local timezone
+ * Avoids UTC conversion issues when creating Date from string
+ */
+export function parseDateString(dateString: string): Date {
+  const [year, month, day] = dateString.split('-').map(Number)
+  return new Date(year, month - 1, day)
+}
+
+/**
  * Format date to Brazilian Portuguese
  */
 export function formatDate(date: string | Date, options?: Intl.DateTimeFormatOptions): string {
@@ -36,7 +45,20 @@ export function formatDate(date: string | Date, options?: Intl.DateTimeFormatOpt
     year: "numeric",
   }
 
-  return new Date(date).toLocaleDateString("pt-BR", options || defaultOptions)
+  // Parse string dates without UTC conversion
+  const dateObj = typeof date === 'string' ? parseDateString(date) : date
+  return dateObj.toLocaleDateString("pt-BR", options || defaultOptions)
+}
+
+/**
+ * Convert Date object to YYYY-MM-DD string for database storage
+ * Uses local timezone to avoid date shifts when converting to UTC
+ */
+export function formatDateForDB(date: Date): string {
+  const year = date.getFullYear()
+  const month = String(date.getMonth() + 1).padStart(2, '0')
+  const day = String(date.getDate()).padStart(2, '0')
+  return `${year}-${month}-${day}`
 }
 
 /**
@@ -165,7 +187,7 @@ export function calculateFrequency(transaction: Transaction, allTransactions: Tr
  * Updated to use: transaction_date (was data_compra), description (was tipo_estabelecimento), amount (was valor_total)
  */
 export function calculateTrend(transaction: Transaction, allTransactions: Transaction[]): number {
-  const currentDate = new Date(transaction.transaction_date)
+  const currentDate = parseDateString(transaction.transaction_date)
   const currentMonth = currentDate.getMonth()
   const currentYear = currentDate.getFullYear()
   const desc = transaction.description?.toLowerCase().trim()
@@ -179,7 +201,7 @@ export function calculateTrend(transaction: Transaction, allTransactions: Transa
   // Calculate total for current month (same description)
   const currentMonthTotal = allTransactions
     .filter((t) => {
-      const date = new Date(t.transaction_date)
+      const date = parseDateString(t.transaction_date)
       return (
         date.getMonth() === currentMonth &&
         date.getFullYear() === currentYear &&
@@ -191,7 +213,7 @@ export function calculateTrend(transaction: Transaction, allTransactions: Transa
   // Calculate total for previous month (same description)
   const previousMonthTotal = allTransactions
     .filter((t) => {
-      const date = new Date(t.transaction_date)
+      const date = parseDateString(t.transaction_date)
       return (
         date.getMonth() === previousMonth &&
         date.getFullYear() === previousYear &&
@@ -207,13 +229,45 @@ export function calculateTrend(transaction: Transaction, allTransactions: Transa
 }
 
 /**
+ * Calculate category trend - percentage of total spent in transaction's categories
+ * Shows what % of the total budget was spent on transactions with the same categories
+ */
+export function calculateCategoryTrend(transaction: Transaction, allTransactions: Transaction[]): number {
+  // Get categories of current transaction
+  const transactionCategories = transaction.categories || []
+
+  // If no categories, return 0
+  if (transactionCategories.length === 0) return 0
+
+  // Get category IDs for comparison
+  const categoryIds = transactionCategories.map(cat => cat.id)
+
+  // Calculate total of all transactions
+  const totalAmount = allTransactions.reduce((sum, t) => sum + t.amount, 0)
+
+  if (totalAmount === 0) return 0
+
+  // Calculate total for transactions with at least one matching category
+  const categoryTotal = allTransactions
+    .filter((t) => {
+      const tCategoryIds = (t.categories || []).map(cat => cat.id)
+      // Check if there's at least one matching category
+      return tCategoryIds.some(id => categoryIds.includes(id))
+    })
+    .reduce((sum, t) => sum + t.amount, 0)
+
+  // Return percentage of total
+  return (categoryTotal / totalAmount) * 100
+}
+
+/**
  * Get month total amount from transactions
  * Updated to use: transaction_date (was data_compra), amount (was valor_total)
  */
 export function getMonthTotal(transactions: Transaction[], month: number, year: number): number {
   return transactions
     .filter((t) => {
-      const date = new Date(t.transaction_date)
+      const date = parseDateString(t.transaction_date)
       return date.getMonth() === month && date.getFullYear() === year
     })
     .reduce((sum, t) => sum + t.amount, 0)

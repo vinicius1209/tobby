@@ -20,20 +20,33 @@ export function TobbyLogo({
   onClick,
 }: TobbyLogoProps) {
   const [clickCount, setClickCount] = useState(0)
+  const [showEasterEgg, setShowEasterEgg] = useState(false)
 
   const handleClick = () => {
-    setClickCount((prev) => prev + 1)
+    const newCount = clickCount + 1
+    setClickCount(newCount)
 
-    // Reset click count after 2 seconds
+    // Trigger easter egg on 3rd click
+    if (newCount === 3) {
+      setShowEasterEgg(true)
+
+      // Hide easter egg after animation completes
+      setTimeout(() => {
+        setShowEasterEgg(false)
+        setClickCount(0)
+      }, 1000)
+    }
+
+    // Reset click count after 3 seconds if not reached 3 clicks
     setTimeout(() => {
-      setClickCount(0)
-    }, 2000)
+      setClickCount((prev) => (prev < 3 ? 0 : prev))
+    }, 3000)
 
     onClick?.()
   }
 
   // Easter egg: 3 clicks triggers special animation
-  const isEasterEgg = clickCount >= 3
+  const isEasterEgg = showEasterEgg
 
   // Base animation variants
   const variants = {
@@ -142,21 +155,6 @@ export function TobbyLogo({
         </motion.div>
       )}
 
-      {/* Tail wag indicator (subtle visual cue) */}
-      {animated && (
-        <motion.div
-          className="absolute -bottom-1 -right-1 w-2 h-2 bg-primary rounded-full"
-          animate={{
-            scale: [0.8, 1.2, 0.8],
-            opacity: [0.5, 1, 0.5],
-          }}
-          transition={{
-            duration: 2,
-            repeat: Infinity,
-            ease: "easeInOut",
-          }}
-        />
-      )}
     </motion.div>
   )
 }

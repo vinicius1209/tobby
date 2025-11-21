@@ -173,22 +173,6 @@ export function TobbyPeek({
               animated={true}
             />
           </motion.div>
-
-          {/* Pulsing Ring */}
-          {!isHovering && (
-            <motion.div
-              className="absolute inset-0 rounded-full border-2 border-primary"
-              animate={{
-                scale: [1, 1.5, 1],
-                opacity: [0.5, 0, 0.5],
-              }}
-              transition={{
-                duration: 2,
-                repeat: Infinity,
-                ease: "easeInOut",
-              }}
-            />
-          )}
         </motion.div>
       )}
     </AnimatePresence>

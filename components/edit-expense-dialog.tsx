@@ -5,6 +5,7 @@ import { useTranslations } from "next-intl"
 import type { Recibo, Category } from "@/lib/types"
 import { getSupabaseBrowserClient } from "@/lib/supabase/client"
 import { getTransactionCategories, assignCategories } from "@/lib/category-utils"
+import { formatDateForDB, parseDateString } from "@/lib/format-utils"
 import { useToast } from "@/hooks/use-toast"
 import {
   Dialog,
@@ -45,7 +46,7 @@ export function EditExpenseDialog({
   // Form state
   const [description, setDescription] = useState(recibo.description || "")
   const [date, setDate] = useState<Date | undefined>(
-    recibo.transaction_date ? new Date(recibo.transaction_date) : undefined
+    recibo.transaction_date ? parseDateString(recibo.transaction_date) : undefined
   )
   const [amount, setAmount] = useState(recibo.amount.toString())
   const [selectedCategories, setSelectedCategories] = useState<Category[]>([])
@@ -54,7 +55,7 @@ export function EditExpenseDialog({
   useEffect(() => {
     if (open) {
       setDescription(recibo.description || "")
-      setDate(recibo.transaction_date ? new Date(recibo.transaction_date) : undefined)
+      setDate(recibo.transaction_date ? parseDateString(recibo.transaction_date) : undefined)
       setAmount(recibo.amount.toString())
       setErrors({})
 
@@ -97,7 +98,7 @@ export function EditExpenseDialog({
     try {
       const updates: Partial<Recibo> = {
         description: description.trim(),
-        transaction_date: date!.toISOString().split('T')[0],
+        transaction_date: formatDateForDB(date!),
         amount: parseFloat(amount),
       }
 

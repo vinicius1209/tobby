@@ -98,42 +98,47 @@ export function AppSidebar() {
     <Sidebar>
       {/* Header */}
       <SidebarHeader className="border-b border-border px-6 py-5">
-        <Link href="/dashboard" className="flex items-center gap-3">
-          <TobbyLogo
-            size={state === "expanded" ? 48 : 40}
-            variant={variant}
-            animated={true}
-          />
-          {state === "expanded" && (
-            <div className="flex flex-col flex-1">
-              <span className="text-sm font-semibold">Tobby</span>
-              <span className="text-xs text-muted-foreground">
-                {t('tagline') || 'Financial Companion'}
-              </span>
-              {budget > 0 && (
-                <div className="mt-2">
-                  <div className="flex justify-between text-xs mb-1">
-                    <span className="text-muted-foreground">{tBudget('percentage')}</span>
-                    <span className={`font-semibold ${
-                      percentage > 100 ? 'text-red-600' :
-                      percentage > 80 ? 'text-yellow-600' :
-                      'text-green-600'
-                    }`}>
-                      {percentage.toFixed(0)}%
-                    </span>
-                  </div>
-                  <div className="w-full bg-muted rounded-full h-1.5 overflow-hidden">
-                    <div
-                      className={`h-full transition-all duration-500 ${
-                        percentage > 100 ? 'bg-red-500' :
-                        percentage > 80 ? 'bg-yellow-500' :
-                        'bg-green-500'
-                      }`}
-                      style={{ width: `${Math.min(percentage, 100)}%` }}
-                    />
-                  </div>
-                </div>
-              )}
+        <Link href="/dashboard" className="flex flex-col gap-3">
+          {/* Logo and Title Row */}
+          <div className="flex items-center gap-3">
+            <TobbyLogo
+              size={state === "expanded" ? 48 : 40}
+              variant={variant}
+              animated={true}
+            />
+            {state === "expanded" && (
+              <div className="flex flex-col">
+                <span className="text-sm font-semibold">Tobby</span>
+                <span className="text-xs text-muted-foreground">
+                  {t('tagline') || 'Financial Companion'}
+                </span>
+              </div>
+            )}
+          </div>
+
+          {/* Budget Progress Bar - Full Width Below */}
+          {state === "expanded" && budget > 0 && (
+            <div className="w-full">
+              <div className="flex justify-between text-xs mb-1.5">
+                <span className="text-muted-foreground">{tBudget('percentage')}</span>
+                <span className={`font-semibold ${
+                  percentage > 100 ? 'text-red-600' :
+                  percentage > 80 ? 'text-yellow-600' :
+                  'text-green-600'
+                }`}>
+                  {percentage.toFixed(0)}%
+                </span>
+              </div>
+              <div className="w-full bg-muted rounded-full h-2 overflow-hidden">
+                <div
+                  className={`h-full transition-all duration-500 ${
+                    percentage > 100 ? 'bg-red-500' :
+                    percentage > 80 ? 'bg-yellow-500' :
+                    'bg-green-500'
+                  }`}
+                  style={{ width: `${Math.min(percentage, 100)}%` }}
+                />
+              </div>
             </div>
           )}
         </Link>

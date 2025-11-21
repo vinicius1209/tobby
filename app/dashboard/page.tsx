@@ -14,7 +14,6 @@ import { TelegramLinkDialog } from "@/components/telegram-link-dialog"
 import { EditExpenseDialog } from "@/components/edit-expense-dialog"
 import { DeleteExpenseDialog } from "@/components/delete-expense-dialog"
 import { TobbyPeek } from "@/components/tobby-peek"
-import { CelebrationModal } from "@/components/celebration-modal"
 import { useTobbyState } from "@/hooks/use-tobby-state"
 import type { Recibo, Category } from "@/lib/types"
 import {
@@ -23,7 +22,9 @@ import {
   calculateMonthPercentage,
   calculateFrequency,
   calculateTrend,
+  calculateCategoryTrend,
   getMonthTotal,
+  parseDateString,
 } from "@/lib/format-utils"
 import { Receipt, TrendingUp, Calendar, CreditCard, Link2, Filter, RefreshCw } from "lucide-react"
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert"
@@ -60,7 +61,6 @@ export default function DashboardPage() {
     dateTo: "",
   })
   const [isRefreshing, setIsRefreshing] = useState(false)
-  const [showCelebration, setShowCelebration] = useState(false)
   const router = useRouter()
   const supabase = getSupabaseBrowserClient()
 
@@ -161,10 +161,10 @@ export default function DashboardPage() {
 
     // Date range filter
     if (filters.dateFrom) {
-      filtered = filtered.filter((r) => new Date(r.transaction_date) >= new Date(filters.dateFrom))
+      filtered = filtered.filter((r) => parseDateString(r.transaction_date) >= parseDateString(filters.dateFrom))
     }
     if (filters.dateTo) {
-      filtered = filtered.filter((r) => new Date(r.transaction_date) <= new Date(filters.dateTo))
+      filtered = filtered.filter((r) => parseDateString(r.transaction_date) <= parseDateString(filters.dateTo))
     }
 
     setFilteredReceipts(filtered)
@@ -283,9 +283,6 @@ export default function DashboardPage() {
         )
         throw error
       }
-
-      // Show celebration on success
-      setShowCelebration(true)
     } catch (error) {
       console.error("Failed to update expense:", error)
       throw error
@@ -328,8 +325,8 @@ export default function DashboardPage() {
 
     switch (sortBy) {
       case "date": {
-        aValue = new Date(a.transaction_date).getTime()
-        bValue = new Date(b.transaction_date).getTime()
+        aValue = parseDateString(a.transaction_date).getTime()
+        bValue = parseDateString(b.transaction_date).getTime()
         break
       }
       case "impact": {
@@ -366,7 +363,7 @@ export default function DashboardPage() {
   const currentMonth = new Date().getMonth()
   const currentYear = new Date().getFullYear()
   const monthlyReceipts = filteredReceipts.filter((r) => {
-    const date = new Date(r.transaction_date)
+    const date = parseDateString(r.transaction_date)
     return date.getMonth() === currentMonth && date.getFullYear() === currentYear
   })
   const monthlySpent = monthlyReceipts.reduce((sum, r) => sum + Number(r.amount), 0)
@@ -510,7 +507,7 @@ export default function DashboardPage() {
                         {sortedReceipts.map((recibo, index) => {
                           const monthPercentage = calculateMonthPercentage(recibo, currentMonthTotal)
                           const frequency = calculateFrequency(recibo, filteredReceipts)
-                          const trend = calculateTrend(recibo, filteredReceipts)
+                          const trend = calculateCategoryTrend(recibo, filteredReceipts)
 
                           return (
                             <ExpenseCardAdvanced
@@ -594,13 +591,6 @@ export default function DashboardPage() {
         budgetPercentage={percentage}
         spent={spent}
         budget={budget}
-      />
-
-      {/* Celebration Modal */}
-      <CelebrationModal
-        isOpen={showCelebration}
-        onClose={() => setShowCelebration(false)}
-        variant="success"
       />
     </DashboardShell>
   )

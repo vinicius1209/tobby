@@ -6,6 +6,7 @@ import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { DatePicker } from "@/components/date-picker"
+import { formatDateForDB } from "@/lib/format-utils"
 import { X, Calendar } from "lucide-react"
 import { cn } from "@/lib/utils"
 import { useTranslations } from "next-intl"
@@ -46,14 +47,14 @@ export function ExpenseFilters({ onFilterChange, establishmentTypes }: ExpenseFi
 
   const handleDateFromChange = (date: Date | undefined) => {
     setDateFromObj(date)
-    const dateString = date ? date.toISOString().split('T')[0] : ""
+    const dateString = date ? formatDateForDB(date) : ""
     handleFilterChange("dateFrom", dateString)
     setActiveQuickFilter(null)
   }
 
   const handleDateToChange = (date: Date | undefined) => {
     setDateToObj(date)
-    const dateString = date ? date.toISOString().split('T')[0] : ""
+    const dateString = date ? formatDateForDB(date) : ""
     handleFilterChange("dateTo", dateString)
     setActiveQuickFilter(null)
   }
@@ -100,8 +101,8 @@ export function ExpenseFilters({ onFilterChange, establishmentTypes }: ExpenseFi
 
     const newFilters = {
       ...filters,
-      dateFrom: startDate.toISOString().split('T')[0],
-      dateTo: endDate.toISOString().split('T')[0],
+      dateFrom: formatDateForDB(startDate),
+      dateTo: formatDateForDB(endDate),
     }
     setFilters(newFilters)
     onFilterChange(newFilters)

@@ -18,7 +18,7 @@ interface ExpenseCardAdvancedProps {
   categories?: Category[] // Categories for this transaction
   monthPercentage: number // Percentual deste gasto no mês total
   frequency: number // Quantas vezes este tipo de despesa apareceu
-  trend: number // Variação % em relação ao mês anterior (positivo = aumentou, negativo = diminuiu)
+  trend: number // Percentual do total gasto nas categorias desta transação
   index: number // Índice da linha para rotação de cores
   onEdit: (recibo: Recibo) => void
   onDelete: (recibo: Recibo) => void
@@ -104,26 +104,20 @@ export function ExpenseCardAdvanced({
         </Badge>
       </div>
 
-      {/* Coluna 5: Badge Tendência (110px) */}
+      {/* Coluna 5: Badge Tendência (110px) - % do total gasto nas categorias */}
       <div className="flex flex-col items-center justify-center">
         {trend !== 0 ? (
           <>
             <div
               className={cn(
                 "flex items-center gap-1 px-2 py-1.5 rounded-md text-sm font-semibold min-w-[70px] justify-center",
-                trend > 0
-                  ? "bg-red-100 text-red-700"
-                  : "bg-green-100 text-green-700"
+                "bg-primary/10 text-primary"
               )}
             >
-              {trend > 0 ? (
-                <TrendingUp className="h-3.5 w-3.5" />
-              ) : (
-                <TrendingDown className="h-3.5 w-3.5" />
-              )}
-              <span>{Math.abs(Math.round(trend))}%</span>
+              <TrendingUp className="h-3.5 w-3.5" />
+              <span>{Math.round(trend)}%</span>
             </div>
-            <span className="text-xs text-muted-foreground mt-1 whitespace-nowrap">{tCard('vsPreviousMonth')}</span>
+            <span className="text-xs text-muted-foreground mt-1 whitespace-nowrap">% categoria</span>
           </>
         ) : (
           <div className="h-14 flex items-center justify-center">

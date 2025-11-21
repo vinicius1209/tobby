@@ -4,15 +4,16 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Project Overview
 
-Tobby is a Next.js expense tracking application that integrates with a Telegram bot for automatic receipt processing. Users can send receipts via Telegram, which are processed and displayed in a web dashboard with analytics, filtering, and subscription features.
+Tobby is a Next.js expense tracking application that integrates with a Telegram bot for automatic receipt processing. Users can send receipts via Telegram, which are processed and displayed in a web dashboard with analytics, filtering, and subscription features. The app features an interactive mascot (Tobby the dog) whose emotional states reflect the user's spending behavior.
 
 **Tech Stack:**
 - Next.js 15.2.4 with App Router
 - React 19 + TypeScript
 - Supabase for backend, authentication, and database
-- Tailwind CSS with Radix UI components
+- Tailwind CSS with Radix UI components (shadcn/ui)
 - next-intl for internationalization (English and Portuguese Brazilian)
 - Recharts for data visualization
+- Framer Motion for animations
 
 ## Development Commands
 
@@ -39,8 +40,8 @@ npm run lint
 
 - **Middleware:** `middleware.ts` handles auth checks using Supabase SSR. Protected routes (`/dashboard/*`) redirect unauthenticated users to `/login`. Authenticated users trying to access `/login` or `/signup` are redirected to `/dashboard`.
 - **Supabase Clients:**
-  - `lib/supabase/client.ts` - Singleton browser client for client components
-  - `lib/supabase/server.ts` - Server client for server components/actions
+  - `lib/supabase/client.ts` - Singleton browser client for client components (`getSupabaseBrowserClient()`)
+  - `lib/supabase/server.ts` - Server client for server components/actions (`getSupabaseServerClient()`)
 - **Environment Variables:** Requires `NEXT_PUBLIC_SUPABASE_URL` and `NEXT_PUBLIC_SUPABASE_ANON_KEY` in `.env`
 
 ### Internationalization (i18n)
@@ -50,27 +51,83 @@ npm run lint
 - **Translation Files:** `messages/en.json` and `messages/pt-br.json`
 - **Usage:** Use `useTranslations()` hook in client components. Messages are provided via `NextIntlClientProvider` in root layout.
 - **Font:** Uses Noto Sans font family loaded via next/font/google
+- **Important:** Always add translations for both locales when adding new features
 
 ### Database Schema
 
 The application uses Supabase with Row Level Security (RLS) enabled on all tables:
 
 **Core Tables:**
-- `recibos_processados` - Stores processed receipts with fields: user_id, chat_id, tipo_estabelecimento, nome_estabelecimento, data_compra, valor_total, metodo_pagamento, itens_comprados, json_original
+- `user_transactions` - Main transactions table (replaces old `recibos_processados`)
+  - Fields: user_id, chat_id, description, transaction_date, transaction_type (withdrawal/deposit), amount, original_json
+  - Supports soft deletes via `deleted_at` timestamp
+- `categories` - User-specific expense categories (name, color, icon)
+- `transaction_categories` - Junction table for many-to-many relationship
 - `telegram_users` - Links Supabase user_id to Telegram chat_id (one-to-one relationship)
 - `user_link_tokens` - Temporary 6-character tokens for linking Telegram accounts (15-minute expiration)
 - `user_subscriptions` - Manages user subscription plans (free/premium)
 - `premium_features` - Defines available features per subscription tier
+- `user_preferences` - Stores user settings like monthly_budget
+- `recurring_transactions` - Manages recurring income/expenses with frequency rules
 
-**Database Views:**
-- `monthly_spending_summary` - Aggregates spending by month and chat_id
-- `spending_by_type` - Aggregates spending by establishment type
+**Migration Scripts:** Located in `supabase/migrations/` directory. Execute via Supabase Dashboard SQL Editor:
+1. `refactor_to_transactions.sql` - Core transaction system refactor
+2. `add_soft_delete_to_recibos.sql` - Soft delete support
+3. `create_recurring_transactions.sql` - Recurring transactions feature
+4. Migration files in `scripts/` directory (older, numbered migrations)
+5. `005_create_user_preferences.sql` - Budget tracking
+6. `006_add_telegram_delete_policy.sql` - Telegram unlinking support
 
-**Migration Scripts:** Located in `scripts/` directory. Execute in order via Supabase Dashboard SQL Editor:
-1. `001_create_recibos_table.sql` - Creates indexes, RLS policies, and views
-2. `002_create_subscriptions_table.sql` - Creates subscription tables and trigger
-3. `003_create_telegram_users_table.sql` - Creates Telegram user linking table
-4. `004_create_user_link_tokens_table.sql` - Creates token system for account linking
+### Budget Tracking System (Critical Architecture)
+
+The budget tracking system uses a **Context Provider pattern** to avoid performance issues:
+
+**Key Components:**
+- `contexts/budget-context.tsx` - **BudgetProvider** with 5-minute cache (CACHE_TTL)
+  - Centralized budget state management
+  - Single query on mount, cached for 5 minutes
+  - Provides: `budgetStatus`, `loading`, `refreshBudget()`, `updateMonthlySpent()`
+- `lib/budget-utils.ts` - Core utilities
+  - `getUserBudget()` - Fetches monthly_budget from user_preferences
+  - `setUserBudget()` - Upserts budget (used in Settings page)
+  - `calculateBudgetStatus()` - Determines Tobby's emotional state based on spending
+- `hooks/use-tobby-state.ts` - Hook that uses context (does NOT query DB directly)
+
+**Tobby's Emotional States:**
+- **happy** (< 80% of budget) - Green indicators
+- **neutral** (80-100% of budget) - Yellow indicators
+- **worried** (> 100% of budget) - Red indicators
+
+**Performance Critical:**
+- Never query `user_preferences` directly in components
+- Always use `useBudget()` context hook
+- Call `refreshBudget()` after updating budget to invalidate cache
+- Use `updateMonthlySpent()` for real-time updates without DB queries
+
+### Tobby Mascot System
+
+Tobby is an interactive mascot that appears throughout the app with dynamic animations:
+
+**Components:**
+- `components/tobby-logo.tsx` - Main Tobby image component with animations
+  - Breathing animation (subtle pulsation)
+  - Hover wiggle effect
+  - Click animations
+  - Easter egg: 3 rapid clicks triggers shake + sparkle effect
+  - Takes `variant` prop (happy/neutral/worried) to show emotional state
+- `components/tobby-peek.tsx` - Floating Tobby that appears on scroll
+  - Appears when scrollY > 200px
+  - Shows budget tooltip on hover
+  - No pulsing ring (removed for cleaner UX)
+- `components/celebration-modal.tsx` - Full-screen celebration with confetti
+  - Triggered after successful transaction save/edit
+  - Uses react-confetti library
+
+**Where Tobby Appears:**
+- Sidebar header - Shows current budget state with progress bar
+- Settings page - Preview of budget status
+- Floating peek - Appears during dashboard scroll
+- Celebration modal - After successful actions
 
 ### Telegram Integration Flow
 
@@ -79,51 +136,154 @@ The application uses Supabase with Row Level Security (RLS) enabled on all table
 3. User sends token to Telegram bot
 4. Bot validates token and creates `telegram_users` record linking user_id ↔ chat_id
 5. Receipts sent to bot are associated with chat_id, which maps to user_id via `telegram_users` table
-6. Dashboard queries `recibos_processados` filtered by the user's chat_id
+6. Dashboard queries `user_transactions` filtered by the user's chat_id
 
 **Key Functions:**
 - `generateLinkToken()` - Creates 15-minute expiring token
 - `checkTelegramLinkStatus()` - Verifies if user has linked Telegram
 - `getActiveToken()` - Retrieves current valid token
+- `unlinkTelegramAccount()` - Deletes telegram_users record (requires migration 006)
+
+### Settings Page Architecture (Component-Based)
+
+Settings page (`/app/settings/page.tsx`) uses a modular component structure:
+
+**Component Breakdown:**
+- `components/settings/budget-settings-section.tsx` - Budget input and visual status
+- `components/settings/account-section.tsx` - Email and member since date
+- `components/settings/telegram-section.tsx` - Telegram connection status and link/unlink actions
+
+**Layout Pattern:**
+- Uses `DashboardShell` wrapper for consistency
+- Grid layout: Budget (full width), then Account + Telegram (2 columns)
+- Each section is self-contained with own state management
 
 ### App Structure
 
 ```
 app/
-├── page.tsx              # Landing page
-├── layout.tsx            # Root layout with i18n provider
-├── login/page.tsx        # Login page
-├── signup/page.tsx       # Sign up page
+├── page.tsx                # Landing page
+├── layout.tsx              # Root layout with i18n, BudgetProvider, Toaster
+├── login/page.tsx          # Login page
+├── signup/page.tsx         # Sign up page
+├── settings/page.tsx       # Settings with budget management
+├── categories/page.tsx     # Category management
+├── recurring-income/page.tsx # Recurring transactions
 └── dashboard/
-    ├── page.tsx          # Main dashboard with expense cards, stats, and filters
-    ├── analytics/page.tsx # Charts and spending analysis
-    └── premium/page.tsx   # Premium subscription features
+    ├── page.tsx            # Main dashboard with cards/timeline views
+    └── premium/page.tsx    # Premium subscription features
 ```
 
 ### Key Components
 
-- `DashboardHeader` - Navigation header with user menu and language switcher
-- `ExpenseCard` - Displays individual receipt with expandable items timeline
-- `ExpenseFilters` - Advanced filtering by date range, establishment type, payment method, and search
-- `StatsCard` - Displays metrics (total spent, monthly spending, avg expense, receipt count)
-- `TelegramLinkDialog` - Modal for generating and displaying link tokens
+**Dashboard Components:**
+- `ExpenseCardAdvanced` - Transaction card with metrics (Impact, Frequency, Trend)
+- `ExpenseListHeader` - Sortable column headers
+- `ExpensesTimeline` - Chronological timeline view
+- `ExpenseFilters` - Advanced filtering UI (date range, search, categories, payment method)
+- `StatsCard` - Displays aggregate metrics
+
+**Dialog Components:**
+- `EditExpenseDialog` - Edit transaction details and categories
+- `DeleteExpenseDialog` - Confirmation dialog with transaction preview
+- `TelegramLinkDialog` - Token generation and status checking
+
+**Layout Components:**
+- `DashboardShell` - Wrapper with sidebar and breadcrumbs
+- `AppSidebar` - Navigation with Tobby header and budget progress bar
 - `Footer` - Footer with links and branding
-- `LanguageSwitcher` - Toggle between en/pt-br, stores preference in cookie
 
-### Utilities
+### Utilities & Helpers
 
-- `lib/format-utils.ts` - Currency formatting, date formatting, unique value extraction
-- `lib/subscription.ts` - Subscription tier checking and premium feature access
-- `lib/types.ts` - TypeScript interfaces for Recibo, TelegramUser, UserLinkToken, etc.
+**Format Utilities (`lib/format-utils.ts`):**
+- `formatCurrency()` - BRL currency formatting
+- `formatDate()` - Localized date formatting
+- `calculateMonthPercentage()` - Transaction % of monthly total
+- `calculateFrequency()` - Count of similar transactions
+- `calculateCategoryTrend()` - **% of total spent in transaction's categories** (NOT month-over-month comparison)
+- `getMonthTotal()` - Sum of transactions for a given month/year
+
+**Type Definitions (`lib/types.ts`):**
+- `Transaction` (formerly `Recibo`) - Main transaction interface with categories array
+- `Category` - Category with name, color, icon
+- `TelegramUser` - Telegram linking data
+- `UserPreferences` - User settings including monthly_budget
 
 ## Important Patterns
 
-1. **Data Fetching in Dashboard:** Always fetch `telegram_users` first to get chat_id, then query `recibos_processados` by chat_id. This ensures users only see their own receipts.
+### 1. Data Fetching in Dashboard
 
-2. **Filtering:** Client-side filtering is applied on already-fetched receipts. Filters include: search term, establishment type, payment method, and date range.
+Always fetch `telegram_users` first to get chat_id, then query `user_transactions` by chat_id. This ensures users only see their own transactions.
 
-3. **Supabase Client Selection:** Use browser client (`getSupabaseBrowserClient()`) in client components with `"use client"` directive. Use server client (`getSupabaseServerClient()`) in server components/actions.
+```typescript
+// 1. Get telegram link
+const { data: telegramUser } = await supabase
+  .from('telegram_users')
+  .select('chat_id')
+  .eq('user_id', user.id)
+  .single()
 
-4. **RLS Pattern:** All tables use RLS with policies that filter by `user_id = auth.uid()`. The `recibos_processados` table filters by chat_id which is validated against the authenticated user's telegram_users record.
+// 2. Fetch transactions by chat_id
+const { data: transactions } = await supabase
+  .from('user_transactions')
+  .select('*, categories(*)')
+  .eq('chat_id', telegramUser.chat_id)
+  .is('deleted_at', null)
+```
 
-5. **TypeScript Configuration:** Build errors are ignored (`ignoreBuildErrors: true` in next.config.mjs) - be aware when making type changes.
+### 2. Category Relationships
+
+Transactions have many-to-many relationships with categories via `transaction_categories` junction table. Always join with categories when fetching transactions:
+
+```typescript
+.select(`
+  *,
+  categories:transaction_categories(
+    category:categories(*)
+  )
+`)
+```
+
+### 3. Supabase Client Selection
+
+- Use `getSupabaseBrowserClient()` in client components with `"use client"` directive
+- Use `getSupabaseServerClient()` in server components/actions
+- Browser client is a singleton, don't put it in useEffect dependencies
+
+### 4. RLS Pattern
+
+All tables use RLS with policies that filter by `user_id = auth.uid()`. The `user_transactions` table filters by chat_id which is validated against the authenticated user's telegram_users record.
+
+### 5. Transaction Metrics
+
+The dashboard displays three metrics per transaction card:
+- **Impact (%)** - `calculateMonthPercentage()` - What % of this month's total is this transaction
+- **Frequency (Nx)** - `calculateFrequency()` - How many times similar transactions appear
+- **Trend (%)** - `calculateCategoryTrend()` - What % of total spending is in these categories (NOT month-over-month comparison)
+
+### 6. Filtering Pattern
+
+Client-side filtering is applied on already-fetched transactions. Filters include: search term, categories, transaction_type, and date range. Sorting is also client-side.
+
+### 7. Component Organization
+
+Settings sections, dashboard cards, and major features are broken into separate components in `/components/` or `/components/settings/`. This improves maintainability and allows for isolated state management.
+
+### 8. TypeScript Configuration
+
+Build errors are ignored (`ignoreBuildErrors: true` in next.config.mjs) - be aware when making type changes. The codebase uses strict TypeScript but skips type checking during builds for faster iteration.
+
+### 9. Animation Guidelines
+
+- Use Framer Motion for all animations
+- Tobby animations should feel playful and responsive
+- Avoid distracting pulsing effects (removed from TobbyLogo and TobbyPeek)
+- Keep animations subtle and performant
+
+### 10. Translation Workflow
+
+When adding new features:
+1. Add English translations to `messages/en.json`
+2. Add Portuguese translations to `messages/pt-br.json`
+3. Use descriptive keys with nested structure (e.g., `settings.budget.title`)
+4. Test both locales before committing
